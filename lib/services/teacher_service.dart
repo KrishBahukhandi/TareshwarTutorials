@@ -93,6 +93,11 @@ class TeacherService {
     });
   }
 
+  /// Alias for setActive for consistency
+  Future<void> toggleTeacherActive(String teacherId, bool isActive) async {
+    return setActive(teacherId: teacherId, isActive: isActive);
+  }
+
   Future<int> countTeachers() async {
     final response = await supabase
         .from('profiles')
