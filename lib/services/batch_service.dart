@@ -50,4 +50,33 @@ class BatchService {
         .order('start_date', ascending: false);
     return data.map<Batch>((row) => Batch.fromMap(row)).toList();
   }
+
+  Future<Batch> fetchBatchById(String batchId) async {
+    final data = await supabase
+        .from('batches')
+        .select()
+        .eq('id', batchId)
+        .single();
+    return Batch.fromMap(data);
+  }
+
+  Future<void> updateBatch({
+    required String id,
+    String? courseId,
+    String? teacherId,
+    DateTime? startDate,
+    DateTime? endDate,
+    int? seatLimit,
+  }) async {
+    final updates = <String, dynamic>{};
+    if (courseId != null) updates['course_id'] = courseId;
+    if (teacherId != null) updates['teacher_id'] = teacherId;
+    if (startDate != null) updates['start_date'] = startDate.toIso8601String();
+    if (endDate != null) updates['end_date'] = endDate.toIso8601String();
+    if (seatLimit != null) updates['seat_limit'] = seatLimit;
+
+    if (updates.isEmpty) return;
+
+    await supabase.from('batches').update(updates).eq('id', id);
+  }
 }

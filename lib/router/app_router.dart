@@ -5,8 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../admin/batches/batches_list_screen.dart';
+import '../admin/batches/edit_batch_screen.dart';
 import '../admin/create_batch_screen.dart';
 import '../admin/create_course_screen.dart';
+import '../admin/courses/edit_course_screen.dart';
 import '../admin/dashboard_overview_screen.dart';
 import '../admin/enrollments/enrollment_management_screen.dart';
 import '../admin/manage_teachers_screen.dart';
@@ -90,6 +92,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/admin/courses/new',
         builder: (context, state) => const CreateCourseScreen(),
       ),
+      GoRoute(
+        path: '/admin/courses/:id/edit',
+        builder: (context, state) => EditCourseScreen(
+          courseId: state.pathParameters['id']!,
+        ),
+      ),
       // Batches Management
       GoRoute(
         path: '/admin/batches',
@@ -98,6 +106,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/admin/batches/new',
         builder: (context, state) => const CreateBatchScreen(),
+      ),
+      GoRoute(
+        path: '/admin/batches/:id/edit',
+        builder: (context, state) => EditBatchScreen(
+          batchId: state.pathParameters['id']!,
+        ),
       ),
       // Enrollment Management
       GoRoute(

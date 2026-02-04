@@ -40,6 +40,22 @@ class CourseService {
     });
   }
 
+  Future<void> updateCourse({
+    required String id,
+    String? title,
+    String? description,
+    double? price,
+  }) async {
+    final updates = <String, dynamic>{};
+    if (title != null) updates['title'] = title;
+    if (description != null) updates['description'] = description;
+    if (price != null) updates['price'] = price;
+
+    if (updates.isEmpty) return;
+
+    await supabase.from('courses').update(updates).eq('id', id);
+  }
+
   Future<void> setPublished({
     required String courseId,
     required bool isPublished,
