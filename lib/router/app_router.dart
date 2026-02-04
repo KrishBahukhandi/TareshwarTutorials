@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../admin/analytics/analytics_dashboard_screen.dart';
 import '../admin/batches/batches_list_screen.dart';
 import '../admin/batches/edit_batch_screen.dart';
 import '../admin/create_batch_screen.dart';
@@ -52,6 +53,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/admin',
         builder: (context, state) => const DashboardOverviewScreen(),
+      ),
+      // Analytics
+      GoRoute(
+        path: '/admin/analytics',
+        builder: (context, state) => const AnalyticsDashboardScreen(),
       ),
       // Students Management
       GoRoute(
