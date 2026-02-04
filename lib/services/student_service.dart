@@ -8,12 +8,14 @@ class StudentService {
   final AuditService _auditService = AuditService();
 
   Future<List<AppUser>> fetchAllStudents({bool includeInactive = false}) async {
-    final data = await supabase
+    final query = supabase
         .from('profiles')
         .select()
         .eq('role', 'student')
-        .eq('is_active', includeInactive ? null : true)
         .order('created_at', ascending: false);
+    
+    // Filter by is_active if not including inactive
+    final data = await (includeInactive ? query : query.eq('is_active', true));
     
     return (data as List).map((item) => AppUser.fromMap(item)).toList();
   }
