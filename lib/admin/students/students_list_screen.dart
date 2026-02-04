@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/utils/app_user.dart';
 import '../../services/student_service.dart';
@@ -35,7 +36,7 @@ class StudentsListScreen extends ConsumerWidget {
                 ),
                 ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/admin/students/create');
+                    context.go('/admin/students/create');
                   },
                   icon: const Icon(Icons.add),
                   label: const Text('Add Student'),
@@ -97,8 +98,9 @@ class StudentsListScreen extends ConsumerWidget {
                               IconButton(
                                 icon: const Icon(Icons.edit),
                                 onPressed: () {
-                                  // TODO: Navigate to edit screen
+                                  context.go('/admin/students/${student.id}/edit');
                                 },
+                                tooltip: 'Edit student',
                               ),
                               IconButton(
                                 icon: const Icon(Icons.delete),
@@ -117,6 +119,9 @@ class StudentsListScreen extends ConsumerWidget {
                                         ),
                                         TextButton(
                                           onPressed: () => Navigator.pop(context, true),
+                                          style: TextButton.styleFrom(
+                                            foregroundColor: Colors.red,
+                                          ),
                                           child: const Text('Delete'),
                                         ),
                                       ],
@@ -125,7 +130,8 @@ class StudentsListScreen extends ConsumerWidget {
 
                                   if (confirm == true) {
                                     try {
-                                      await StudentService().deleteStudent(student.id);
+                                      // Use soft delete instead of hard delete
+                                      await StudentService().softDeleteStudent(student.id);
                                       ref.invalidate(studentsProvider);
                                       if (context.mounted) {
                                         ScaffoldMessenger.of(context).showSnackBar(
@@ -146,6 +152,7 @@ class StudentsListScreen extends ConsumerWidget {
                                     }
                                   }
                                 },
+                                tooltip: 'Delete student',
                               ),
                             ],
                           ),

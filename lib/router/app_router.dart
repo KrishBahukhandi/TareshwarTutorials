@@ -10,6 +10,7 @@ import '../admin/create_course_screen.dart';
 import '../admin/dashboard_overview_screen.dart';
 import '../admin/manage_teachers_screen.dart';
 import '../admin/students/create_student_screen.dart';
+import '../admin/students/edit_student_screen.dart';
 import '../admin/students/students_list_screen.dart';
 import '../admin/teachers/create_teacher_screen.dart';
 import '../auth/auth_controller.dart';
@@ -56,6 +57,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/admin/students/create',
         builder: (context, state) => const CreateStudentScreen(),
+      ),
+      GoRoute(
+        path: '/admin/students/:id/edit',
+        builder: (context, state) => EditStudentScreen(
+          studentId: state.pathParameters['id']!,
+        ),
       ),
       // Teachers Management
       GoRoute(
