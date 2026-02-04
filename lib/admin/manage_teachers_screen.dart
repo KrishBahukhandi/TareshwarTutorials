@@ -265,6 +265,13 @@ class _ManageTeachersScreenState extends ConsumerState<ManageTeachersScreen> {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Edit button
+          IconButton(
+            icon: const Icon(Icons.edit, size: 20),
+            onPressed: () => context.go('/admin/teachers/${teacher.id}/edit'),
+            tooltip: 'Edit teacher',
+            color: AppTheme.gray700,
+          ),
           // Toggle active/inactive
           IconButton(
             icon: Icon(
