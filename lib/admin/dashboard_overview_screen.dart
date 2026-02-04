@@ -46,23 +46,26 @@ class DashboardOverviewScreen extends ConsumerWidget {
     return AdminLayout(
       currentRoute: '/admin',
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Page Header
             Text(
-              'Dashboard Overview',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              'Dashboard',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             Text(
-              'Welcome back! Here\'s what\'s happening with your platform.',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+              'Welcome back! Here\'s an overview of your platform.',
+              style: TextStyle(
+                fontSize: 15,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: 32),
 
@@ -81,17 +84,17 @@ class DashboardOverviewScreen extends ConsumerWidget {
                   crossAxisCount: crossAxisCount,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 1.5,
+                  mainAxisSpacing: 20,
+                  crossAxisSpacing: 20,
+                  childAspectRatio: 1.4,
                   children: [
                     // Students Card
                     ref.watch(studentCountProvider).when(
                           data: (count) => StatCard(
                             title: 'Total Students',
                             value: count.toString(),
-                            icon: Icons.people,
-                            color: Colors.blue,
+                            icon: Icons.people_rounded,
+                            color: const Color(0xFF3B82F6),
                             subtitle: 'Registered users',
                             onTap: () => context.go('/admin/students'),
                           ),
@@ -106,8 +109,8 @@ class DashboardOverviewScreen extends ConsumerWidget {
                             return StatCard(
                               title: 'Total Teachers',
                               value: count.toString(),
-                              icon: Icons.person,
-                              color: Colors.green,
+                              icon: Icons.person_rounded,
+                              color: const Color(0xFF10B981),
                               subtitle: '$activeCount active',
                               onTap: () => context.go('/admin/teachers'),
                             );
@@ -121,8 +124,8 @@ class DashboardOverviewScreen extends ConsumerWidget {
                           data: (count) => StatCard(
                             title: 'Total Courses',
                             value: count.toString(),
-                            icon: Icons.book,
-                            color: Colors.purple,
+                            icon: Icons.book_rounded,
+                            color: const Color(0xFF8B5CF6),
                             subtitle: 'Available courses',
                             onTap: () => context.go('/admin/courses'),
                           ),
@@ -135,8 +138,8 @@ class DashboardOverviewScreen extends ConsumerWidget {
                           data: (count) => StatCard(
                             title: 'Total Batches',
                             value: count.toString(),
-                            icon: Icons.class_,
-                            color: Colors.orange,
+                            icon: Icons.class_rounded,
+                            color: const Color(0xFFF59E0B),
                             subtitle: 'Running batches',
                             onTap: () => context.go('/admin/batches'),
                           ),
@@ -149,8 +152,8 @@ class DashboardOverviewScreen extends ConsumerWidget {
                           data: (count) => StatCard(
                             title: 'Total Enrollments',
                             value: count.toString(),
-                            icon: Icons.assignment,
-                            color: Colors.teal,
+                            icon: Icons.assignment_rounded,
+                            color: const Color(0xFF14B8A6),
                             subtitle: 'Active enrollments',
                             onTap: () => context.go('/admin/enrollments'),
                           ),
@@ -162,14 +165,16 @@ class DashboardOverviewScreen extends ConsumerWidget {
               },
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 40),
 
             // Quick Actions
             Text(
               'Quick Actions',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             const SizedBox(height: 16),
 
@@ -178,22 +183,22 @@ class DashboardOverviewScreen extends ConsumerWidget {
               runSpacing: 12,
               children: [
                 _QuickActionButton(
-                  icon: Icons.person_add,
+                  icon: Icons.person_add_rounded,
                   label: 'Add Teacher',
                   onTap: () => context.go('/admin/teachers/create'),
                 ),
                 _QuickActionButton(
-                  icon: Icons.group_add,
+                  icon: Icons.group_add_rounded,
                   label: 'Add Student',
                   onTap: () => context.go('/admin/students/create'),
                 ),
                 _QuickActionButton(
-                  icon: Icons.add,
+                  icon: Icons.add_rounded,
                   label: 'Create Course',
                   onTap: () => context.go('/admin/courses/new'),
                 ),
                 _QuickActionButton(
-                  icon: Icons.class_,
+                  icon: Icons.class_rounded,
                   label: 'Create Batch',
                   onTap: () => context.go('/admin/batches/new'),
                 ),
@@ -277,34 +282,12 @@ class _QuickActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
-    return Material(
-      color: theme.colorScheme.primaryContainer,
-      borderRadius: BorderRadius.circular(12),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                color: theme.colorScheme.onPrimaryContainer,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                label,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
+    return OutlinedButton.icon(
+      onPressed: onTap,
+      icon: Icon(icon, size: 18),
+      label: Text(label),
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       ),
     );
   }
