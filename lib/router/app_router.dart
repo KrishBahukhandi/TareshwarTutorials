@@ -8,6 +8,7 @@ import '../admin/batches/batches_list_screen.dart';
 import '../admin/create_batch_screen.dart';
 import '../admin/create_course_screen.dart';
 import '../admin/dashboard_overview_screen.dart';
+import '../admin/enrollments/enrollment_management_screen.dart';
 import '../admin/manage_teachers_screen.dart';
 import '../admin/students/create_student_screen.dart';
 import '../admin/students/edit_student_screen.dart';
@@ -90,6 +91,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/admin/batches/new',
         builder: (context, state) => const CreateBatchScreen(),
+      ),
+      // Enrollment Management
+      GoRoute(
+        path: '/admin/enrollments',
+        builder: (context, state) => const EnrollmentManagementScreen(),
       ),
       GoRoute(
         path: '/teacher',
