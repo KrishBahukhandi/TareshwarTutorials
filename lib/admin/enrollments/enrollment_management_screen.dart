@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/app_user.dart';
@@ -11,7 +10,6 @@ import '../widgets/admin_layout.dart';
 
 final batchesProvider = FutureProvider<List<BatchWithCourse>>((ref) async {
   // For now get all batches - ideally would fetch with course info
-  final batches = await BatchService().fetchAllBatches();
   // This is a simplified version - in production you'd fetch with course details
   return [];
 });
