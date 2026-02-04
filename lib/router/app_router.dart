@@ -9,6 +9,7 @@ import '../admin/batches/batches_list_screen.dart';
 import '../admin/batches/edit_batch_screen.dart';
 import '../admin/create_batch_screen.dart';
 import '../admin/create_course_screen.dart';
+import '../admin/courses/courses_list_screen.dart';
 import '../admin/courses/edit_course_screen.dart';
 import '../admin/dashboard_overview_screen.dart';
 import '../admin/enrollments/enrollment_management_screen.dart';
@@ -92,7 +93,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // Courses Management
       GoRoute(
         path: '/admin/courses',
-        builder: (context, state) => const CreateCourseScreen(),
+        builder: (context, state) => const CoursesListScreen(),
       ),
       GoRoute(
         path: '/admin/courses/new',

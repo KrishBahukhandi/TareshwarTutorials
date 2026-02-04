@@ -3,21 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../../core/utils/batch.dart';
-import '../../services/batch_service.dart';
+import '../../core/utils/course.dart';
+import '../../services/course_service.dart';
 import '../widgets/admin_layout.dart';
 import '../widgets/search_filter_widgets.dart';
 
-class BatchesListScreen extends ConsumerStatefulWidget {
-  const BatchesListScreen({super.key});
+class CoursesListScreen extends ConsumerStatefulWidget {
+  const CoursesListScreen({super.key});
 
   @override
-  ConsumerState<BatchesListScreen> createState() => _BatchesListScreenState();
+  ConsumerState<CoursesListScreen> createState() => _CoursesListScreenState();
 }
 
-class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
-  List<Batch> _allBatches = [];
-  List<Batch> _filteredBatches = [];
+class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
+  List<Course> _allCourses = [];
+  List<Course> _filteredCourses = [];
   bool _isLoading = true;
   String _searchQuery = '';
   String _selectedFilter = 'all';
@@ -27,15 +27,15 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
   @override
   void initState() {
     super.initState();
-    _loadBatches();
+    _loadCourses();
   }
 
-  Future<void> _loadBatches() async {
+  Future<void> _loadCourses() async {
     setState(() => _isLoading = true);
     try {
-      final batches = await BatchService().fetchAllBatches();
+      final courses = await CourseService().fetchAllCourses();
       setState(() {
-        _allBatches = batches;
+        _allCourses = courses;
         _applyFilters();
         _isLoading = false;
       });
@@ -43,7 +43,7 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error loading batches: $e'),
+            content: Text('Error loading courses: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -52,55 +52,49 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
     }
   }
 
-  bool _isBatchActive(Batch batch) {
-    final now = DateTime.now();
-    return batch.startDate.isBefore(now) && batch.endDate.isAfter(now);
-  }
-
   void _applyFilters() {
-    var filtered = _allBatches;
+    var filtered = _allCourses;
 
-    // Apply search filter (by batch ID substring)
+    // Apply search filter
     if (_searchQuery.isNotEmpty) {
-      filtered = filtered.where((batch) {
+      filtered = filtered.where((course) {
         final query = _searchQuery.toLowerCase();
-        return batch.id.toLowerCase().contains(query);
+        return course.title.toLowerCase().contains(query) ||
+            course.description.toLowerCase().contains(query);
       }).toList();
     }
 
     // Apply status filter
-    if (_selectedFilter == 'active') {
-      filtered = filtered.where((b) => _isBatchActive(b)).toList();
-    } else if (_selectedFilter == 'upcoming') {
-      filtered = filtered.where((b) => b.startDate.isAfter(DateTime.now())).toList();
-    } else if (_selectedFilter == 'past') {
-      filtered = filtered.where((b) => b.endDate.isBefore(DateTime.now())).toList();
+    if (_selectedFilter == 'published') {
+      filtered = filtered.where((c) => c.isPublished).toList();
+    } else if (_selectedFilter == 'draft') {
+      filtered = filtered.where((c) => !c.isPublished).toList();
     }
 
     setState(() {
-      _filteredBatches = filtered;
+      _filteredCourses = filtered;
       _currentPage = 1; // Reset to first page
     });
   }
 
-  List<Batch> get _paginatedBatches {
+  List<Course> get _paginatedCourses {
     final start = (_currentPage - 1) * _itemsPerPage;
     final end = start + _itemsPerPage;
-    if (start >= _filteredBatches.length) return [];
-    return _filteredBatches.sublist(
+    if (start >= _filteredCourses.length) return [];
+    return _filteredCourses.sublist(
       start,
-      end > _filteredBatches.length ? _filteredBatches.length : end,
+      end > _filteredCourses.length ? _filteredCourses.length : end,
     );
   }
 
   int get _totalPages {
-    return (_filteredBatches.length / _itemsPerPage).ceil();
+    return (_filteredCourses.length / _itemsPerPage).ceil();
   }
 
   @override
   Widget build(BuildContext context) {
     return AdminLayout(
-      currentRoute: '/admin/batches',
+      currentRoute: '/admin/courses',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -114,28 +108,28 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Batches Management',
+                      'Courses Management',
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                     ),
                     FilledButton.icon(
-                      onPressed: () => context.go('/admin/batches/new'),
+                      onPressed: () => context.go('/admin/courses/new'),
                       icon: const Icon(Icons.add, size: 18),
-                      label: const Text('Add Batch'),
+                      label: const Text('Add Course'),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '${_filteredBatches.length} batch${_filteredBatches.length != 1 ? 'es' : ''} found',
+                  '${_filteredCourses.length} course${_filteredCourses.length != 1 ? 's' : ''} found',
                   style: TextStyle(fontSize: 14, color: AppTheme.gray600),
                 ),
                 const SizedBox(height: 24),
 
                 // Search and Filters
                 AdminSearchFilters(
-                  searchHint: 'Search by batch ID...',
+                  searchHint: 'Search by title or description...',
                   onSearch: (query) {
                     setState(() => _searchQuery = query);
                     _applyFilters();
@@ -143,28 +137,22 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
                   searchValue: _searchQuery,
                   filters: [
                     FilterOption(
-                      label: 'All Batches',
+                      label: 'All Courses',
                       value: 'all',
-                      icon: Icons.groups,
+                      icon: Icons.book,
                       color: AppTheme.primaryBlue,
                     ),
                     FilterOption(
-                      label: 'Active',
-                      value: 'active',
-                      icon: Icons.play_circle,
+                      label: 'Published',
+                      value: 'published',
+                      icon: Icons.public,
                       color: AppTheme.success,
                     ),
                     FilterOption(
-                      label: 'Upcoming',
-                      value: 'upcoming',
-                      icon: Icons.schedule,
-                      color: AppTheme.info,
-                    ),
-                    FilterOption(
-                      label: 'Past',
-                      value: 'past',
-                      icon: Icons.history,
-                      color: AppTheme.gray500,
+                      label: 'Draft',
+                      value: 'draft',
+                      icon: Icons.public_off,
+                      color: AppTheme.warning,
                     ),
                   ],
                   selectedFilter: _selectedFilter,
@@ -177,23 +165,23 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
             ),
           ),
 
-          // Batches list
+          // Courses list
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _filteredBatches.isEmpty
+                : _filteredCourses.isEmpty
                     ? AdminEmptyState(
                         title: _searchQuery.isEmpty
-                            ? 'No batches yet'
-                            : 'No batches found',
+                            ? 'No courses yet'
+                            : 'No courses found',
                         message: _searchQuery.isEmpty
-                            ? 'Create your first batch to get started'
+                            ? 'Add your first course to get started'
                             : 'Try adjusting your search or filters',
-                        icon: Icons.groups_outlined,
+                        icon: Icons.book_outlined,
                         onAction: _searchQuery.isEmpty
-                            ? () => context.go('/admin/batches/new')
+                            ? () => context.go('/admin/courses/new')
                             : null,
-                        actionLabel: _searchQuery.isEmpty ? 'Add Batch' : null,
+                        actionLabel: _searchQuery.isEmpty ? 'Add Course' : null,
                       )
                     : Column(
                         children: [
@@ -206,11 +194,11 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
                                 side: BorderSide(color: AppTheme.gray200),
                               ),
                               child: ListView.separated(
-                                itemCount: _paginatedBatches.length,
+                                itemCount: _paginatedCourses.length,
                                 separatorBuilder: (_, __) => const Divider(height: 1),
                                 itemBuilder: (context, index) {
-                                  final batch = _paginatedBatches[index];
-                                  return _buildBatchTile(batch);
+                                  final course = _paginatedCourses[index];
+                                  return _buildCourseTile(course);
                                 },
                               ),
                             ),
@@ -222,7 +210,7 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
                               currentPage: _currentPage,
                               totalPages: _totalPages,
                               itemsPerPage: _itemsPerPage,
-                              totalItems: _filteredBatches.length,
+                              totalItems: _filteredCourses.length,
                               onPageChanged: (page) {
                                 setState(() => _currentPage = page);
                               },
@@ -235,46 +223,23 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
     );
   }
 
-  Widget _buildBatchTile(Batch batch) {
-    final isActive = _isBatchActive(batch);
-    final isUpcoming = batch.startDate.isAfter(DateTime.now());
-    final startDate = '${batch.startDate.day}/${batch.startDate.month}/${batch.startDate.year}';
-    final endDate = '${batch.endDate.day}/${batch.endDate.month}/${batch.endDate.year}';
-    
-    Color statusColor;
-    String statusText;
-    IconData statusIcon;
-    
-    if (isActive) {
-      statusColor = AppTheme.success;
-      statusText = 'Active';
-      statusIcon = Icons.play_circle;
-    } else if (isUpcoming) {
-      statusColor = AppTheme.info;
-      statusText = 'Upcoming';
-      statusIcon = Icons.schedule;
-    } else {
-      statusColor = AppTheme.gray500;
-      statusText = 'Past';
-      statusIcon = Icons.history;
-    }
-
+  Widget _buildCourseTile(Course course) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       leading: Container(
         width: 50,
         height: 50,
         decoration: BoxDecoration(
-          color: statusColor.withOpacity(0.1),
+          color: AppTheme.primaryBlue.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(Icons.groups, color: statusColor),
+        child: Icon(Icons.book, color: AppTheme.primaryBlue),
       ),
       title: Row(
         children: [
           Expanded(
             child: Text(
-              'Batch ${batch.id.substring(0, 8).toUpperCase()}',
+              course.title.isEmpty ? 'Untitled' : course.title,
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
@@ -282,20 +247,26 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: course.isPublished
+                  ? AppTheme.success.withOpacity(0.1)
+                  : AppTheme.warning.withOpacity(0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(statusIcon, size: 12, color: statusColor),
+                Icon(
+                  course.isPublished ? Icons.public : Icons.public_off,
+                  size: 12,
+                  color: course.isPublished ? AppTheme.success : AppTheme.warning,
+                ),
                 const SizedBox(width: 4),
                 Text(
-                  statusText,
+                  course.isPublished ? 'Published' : 'Draft',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: statusColor,
+                    color: course.isPublished ? AppTheme.success : AppTheme.warning,
                   ),
                 ),
               ],
@@ -306,27 +277,21 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Icon(Icons.calendar_today, size: 14, color: AppTheme.gray600),
-              const SizedBox(width: 6),
-              Text(
-                '$startDate → $endDate',
-                style: TextStyle(fontSize: 13, color: AppTheme.gray600),
-              ),
-            ],
-          ),
           const SizedBox(height: 4),
-          Row(
-            children: [
-              Icon(Icons.event_seat, size: 14, color: AppTheme.gray600),
-              const SizedBox(width: 6),
-              Text(
-                '${batch.seatLimit} seats',
-                style: TextStyle(fontSize: 13, color: AppTheme.gray600),
-              ),
-            ],
+          Text(
+            course.description.isEmpty ? 'No description' : course.description,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: 13, color: AppTheme.gray600),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '₹${course.price.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.primaryBlue,
+            ),
           ),
         ],
       ),
@@ -336,12 +301,50 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
           // Edit button
           IconButton(
             icon: const Icon(Icons.edit, size: 20),
-            onPressed: () => context.go('/admin/batches/${batch.id}/edit'),
-            tooltip: 'Edit batch',
+            onPressed: () => context.go('/admin/courses/${course.id}/edit'),
+            tooltip: 'Edit course',
             color: AppTheme.gray700,
+          ),
+          // Toggle published
+          IconButton(
+            icon: Icon(
+              course.isPublished ? Icons.visibility : Icons.visibility_off,
+              color: course.isPublished ? AppTheme.success : AppTheme.gray400,
+            ),
+            tooltip: course.isPublished ? 'Unpublish' : 'Publish',
+            onPressed: () => _togglePublished(course),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _togglePublished(Course course) async {
+    try {
+      await CourseService().setPublished(
+        courseId: course.id,
+        isPublished: !course.isPublished,
+      );
+      _loadCourses();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Course ${course.isPublished ? "unpublished" : "published"} successfully',
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
