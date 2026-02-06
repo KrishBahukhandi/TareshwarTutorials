@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -28,6 +29,7 @@ class _AnalyticsDashboardScreenState
   int _totalCourses = 0;
   int _publishedCourses = 0;
   int _totalBatches = 0;
+  int _activeBatches = 0;
 
   @override
   void initState() {
@@ -49,6 +51,12 @@ class _AnalyticsDashboardScreenState
         BatchService().fetchAllBatches(),
       ]);
 
+      final allBatches = results[5] as List;
+      final now = DateTime.now();
+      final activeBatchesCount = allBatches.where((batch) {
+        return batch.startDate.isBefore(now) && batch.endDate.isAfter(now);
+      }).length;
+
       setState(() {
         _totalStudents = (results[0] as List).length;
         _activeStudents = (results[1] as List).length;
@@ -59,7 +67,8 @@ class _AnalyticsDashboardScreenState
         
         _totalCourses = (results[3] as List).length;
         _publishedCourses = (results[4] as List).length;
-        _totalBatches = (results[5] as List).length;
+        _totalBatches = allBatches.length;
+        _activeBatches = activeBatchesCount;
         
         _isLoading = false;
       });
@@ -114,13 +123,26 @@ class _AnalyticsDashboardScreenState
 
               // Charts Section
               Text(
-                'Trends & Distribution',
+                'Platform Insights',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
               ),
               const SizedBox(height: 16),
-              _buildChartsPlaceholder(),
+              
+              // Row with two charts
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: _buildUserDistributionChart()),
+                  const SizedBox(width: 16),
+                  Expanded(child: _buildContentDistributionChart()),
+                ],
+              ),
+              const SizedBox(height: 16),
+              
+              // Full width chart
+              _buildBatchStatusChart(),
             ],
           ],
         ),
@@ -169,10 +191,10 @@ class _AnalyticsDashboardScreenState
             _buildMetricCard(
               title: 'Total Batches',
               value: _totalBatches.toString(),
-              subtitle: 'Running batches',
+              subtitle: '$_activeBatches active',
               icon: Icons.groups,
               color: AppTheme.info,
-              trend: 1.0,
+              trend: _activeBatches / (_totalBatches > 0 ? _totalBatches : 1),
             ),
           ],
         );
@@ -262,148 +284,267 @@ class _AnalyticsDashboardScreenState
     );
   }
 
-  Widget _buildChartsPlaceholder() {
-    return Column(
-      children: [
-        // Enrollment Overview
-        Card(
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: AppTheme.gray200),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Enrollment Overview',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.gray900,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Visual charts will be added here',
-                  style: TextStyle(fontSize: 14, color: AppTheme.gray600),
-                ),
-                const SizedBox(height: 24),
-                Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: AppTheme.gray50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppTheme.gray200, style: BorderStyle.solid),
-                  ),
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.bar_chart, size: 48, color: AppTheme.gray400),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Chart Placeholder',
-                          style: TextStyle(color: AppTheme.gray500),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Install fl_chart package for visualizations',
-                          style: TextStyle(fontSize: 12, color: AppTheme.gray400),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        
-        // Batch Occupancy
-        Row(
+  Widget _buildUserDistributionChart() {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AppTheme.gray200),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: AppTheme.gray200),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Batch Occupancy',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.gray900,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Container(
-                        height: 150,
-                        decoration: BoxDecoration(
-                          color: AppTheme.gray50,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppTheme.gray200),
-                        ),
-                        child: Center(
-                          child: Icon(Icons.pie_chart, size: 40, color: AppTheme.gray400),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+            Text(
+              'User Distribution',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.gray900,
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: AppTheme.gray200),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Growth Trends',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.gray900,
-                        ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 200,
+              child: PieChart(
+                PieChartData(
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 50,
+                  sections: [
+                    PieChartSectionData(
+                      value: _activeStudents.toDouble(),
+                      title: 'Students\n$_activeStudents',
+                      color: AppTheme.primaryBlue,
+                      radius: 60,
+                      titleStyle: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                      const SizedBox(height: 24),
-                      Container(
-                        height: 150,
-                        decoration: BoxDecoration(
-                          color: AppTheme.gray50,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: AppTheme.gray200),
-                        ),
-                        child: Center(
-                          child: Icon(Icons.show_chart, size: 40, color: AppTheme.gray400),
-                        ),
+                    ),
+                    PieChartSectionData(
+                      value: _activeTeachers.toDouble(),
+                      title: 'Teachers\n$_activeTeachers',
+                      color: AppTheme.success,
+                      radius: 60,
+                      titleStyle: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ],
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildContentDistributionChart() {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AppTheme.gray200),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Content Distribution',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.gray900,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 200,
+              child: PieChart(
+                PieChartData(
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 50,
+                  sections: [
+                    PieChartSectionData(
+                      value: _publishedCourses.toDouble(),
+                      title: 'Courses\n$_publishedCourses',
+                      color: AppTheme.warning,
+                      radius: 60,
+                      titleStyle: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    PieChartSectionData(
+                      value: _totalBatches.toDouble(),
+                      title: 'Batches\n$_totalBatches',
+                      color: AppTheme.info,
+                      radius: 60,
+                      titleStyle: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBatchStatusChart() {
+    
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: AppTheme.gray200),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Platform Activity Overview',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.gray900,
+              ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              height: 250,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: [
+                    _activeStudents.toDouble(),
+                    _activeTeachers.toDouble(),
+                    _publishedCourses.toDouble(),
+                    _activeBatches.toDouble(),
+                  ].reduce((a, b) => a > b ? a : b) * 1.2,
+                  barTouchData: BarTouchData(enabled: true),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        getTitlesWidget: (value, meta) {
+                          const titles = ['Students', 'Teachers', 'Courses', 'Active\nBatches'];
+                          if (value.toInt() >= 0 && value.toInt() < titles.length) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Text(
+                                titles[value.toInt()],
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: AppTheme.gray600,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            );
+                          }
+                          return const Text('');
+                        },
+                      ),
+                    ),
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 40,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            value.toInt().toString(),
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppTheme.gray600,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  ),
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: 10,
+                    getDrawingHorizontalLine: (value) {
+                      return FlLine(
+                        color: AppTheme.gray200,
+                        strokeWidth: 1,
+                      );
+                    },
+                  ),
+                  borderData: FlBorderData(show: false),
+                  barGroups: [
+                    BarChartGroupData(
+                      x: 0,
+                      barRods: [
+                        BarChartRodData(
+                          toY: _activeStudents.toDouble(),
+                          color: AppTheme.primaryBlue,
+                          width: 40,
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                        ),
+                      ],
+                    ),
+                    BarChartGroupData(
+                      x: 1,
+                      barRods: [
+                        BarChartRodData(
+                          toY: _activeTeachers.toDouble(),
+                          color: AppTheme.success,
+                          width: 40,
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                        ),
+                      ],
+                    ),
+                    BarChartGroupData(
+                      x: 2,
+                      barRods: [
+                        BarChartRodData(
+                          toY: _publishedCourses.toDouble(),
+                          color: AppTheme.warning,
+                          width: 40,
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                        ),
+                      ],
+                    ),
+                    BarChartGroupData(
+                      x: 3,
+                      barRods: [
+                        BarChartRodData(
+                          toY: _activeBatches.toDouble(),
+                          color: AppTheme.info,
+                          width: 40,
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
