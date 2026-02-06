@@ -171,4 +171,32 @@ class StudentService {
     
     return response.length;
   }
+
+  // ================================================
+  // STUDENT PORTAL METHODS
+  // ================================================
+  
+  Future<List<Map<String, dynamic>>> fetchStudentEnrollments(String studentId) async {
+    final enrollments = await supabase
+        .from('enrollments')
+        .select('*, batches(*, courses(*))')
+        .eq('student_id', studentId)
+        .eq('is_active', true)
+        .order('created_at', ascending: false);
+    return List<Map<String, dynamic>>.from(enrollments as List);
+  }
+  
+  Future<Map<String, int>> fetchStudentStats(String studentId) async {
+    final enrollments = await supabase
+        .from('enrollments')
+        .select('batch_id')
+        .eq('student_id', studentId)
+        .eq('is_active', true);
+    final enrolledCount = (enrollments as List).length;
+    return {
+      'enrolledCourses': enrolledCount,
+      'totalVideos': 0,
+      'totalNotes': 0,
+    };
+  }
 }

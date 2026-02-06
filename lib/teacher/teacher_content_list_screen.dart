@@ -200,9 +200,11 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
   Widget _buildVideosTab(AsyncValue videos, bool isMobile, double padding) {
     return videos.when(
       data: (items) {
-        final filtered = items.where((video) {
+        final List<dynamic> videoList = items as List<dynamic>;
+        final filtered = videoList.where((video) {
           if (_searchQuery.isEmpty) return true;
-          return video.title.toLowerCase().contains(_searchQuery);
+          final title = (video as Map<String, dynamic>)['title']?.toString() ?? '';
+          return title.toLowerCase().contains(_searchQuery);
         }).toList();
 
         if (filtered.isEmpty) {
@@ -247,9 +249,11 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
   Widget _buildNotesTab(AsyncValue notes, bool isMobile, double padding) {
     return notes.when(
       data: (items) {
-        final filtered = items.where((note) {
+        final List<dynamic> notesList = items as List<dynamic>;
+        final filtered = notesList.where((note) {
           if (_searchQuery.isEmpty) return true;
-          return note.title.toLowerCase().contains(_searchQuery);
+          final title = (note as Map<String, dynamic>)['title']?.toString() ?? '';
+          return title.toLowerCase().contains(_searchQuery);
         }).toList();
 
         if (filtered.isEmpty) {
@@ -428,7 +432,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    video.title,
+                    (video as Map<String, dynamic>)['title']?.toString() ?? 'Untitled',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -439,7 +443,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Batch ID: ${video.batchId}',
+                    'Batch ID: ${video['batch_id']?.toString() ?? 'N/A'}',
                     style: TextStyle(
                       fontSize: 13,
                       color: AppTheme.gray600,
@@ -462,18 +466,21 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                     ],
                   ),
                   onTap: () {
-                    Future.delayed(Duration.zero, () => _confirmDelete(
-                      context,
-                      'video',
-                      video.title,
-                      () async {
-                        await ref.read(videoServiceProvider).deleteVideo(
-                          videoId: video.id,
-                          storagePath: video.videoUrl,
-                        );
-                        ref.invalidate(videoListProvider);
-                      },
-                    ));
+                    Future.delayed(Duration.zero, () {
+                      final videoMap = video as Map<String, dynamic>;
+                      _confirmDelete(
+                        context,
+                        'video',
+                        videoMap['title']?.toString() ?? 'this video',
+                        () async {
+                          await ref.read(videoServiceProvider).deleteVideo(
+                            videoId: videoMap['id'] as String,
+                            storagePath: videoMap['video_url'] as String,
+                          );
+                          ref.invalidate(videoListProvider);
+                        },
+                      );
+                    });
                   },
                 ),
               ],
@@ -516,7 +523,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    note.title,
+                    (note as Map<String, dynamic>)['title']?.toString() ?? 'Untitled',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -527,7 +534,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Batch ID: ${note.batchId}',
+                    'Batch ID: ${note['batch_id']?.toString() ?? 'N/A'}',
                     style: TextStyle(
                       fontSize: 13,
                       color: AppTheme.gray600,
@@ -550,18 +557,21 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                     ],
                   ),
                   onTap: () {
-                    Future.delayed(Duration.zero, () => _confirmDelete(
-                      context,
-                      'note',
-                      note.title,
-                      () async {
-                        await ref.read(notesServiceProvider).deleteNote(
-                          noteId: note.id,
-                          storagePath: note.fileUrl,
-                        );
-                        ref.invalidate(notesListProvider);
-                      },
-                    ));
+                    Future.delayed(Duration.zero, () {
+                      final noteMap = note as Map<String, dynamic>;
+                      _confirmDelete(
+                        context,
+                        'note',
+                        noteMap['title']?.toString() ?? 'this note',
+                        () async {
+                          await ref.read(notesServiceProvider).deleteNote(
+                            noteId: noteMap['id'] as String,
+                            storagePath: noteMap['file_url'] as String,
+                          );
+                          ref.invalidate(notesListProvider);
+                        },
+                      );
+                    });
                   },
                 ),
               ],

@@ -24,10 +24,12 @@ import '../auth/login_screen.dart';
 import '../auth/signup_screen.dart';
 import '../student/course_detail_screen.dart';
 import '../student/course_list_screen.dart';
+import '../student/my_courses_screen.dart';
 import '../student/notes_list_screen.dart';
 import '../student/student_dashboard.dart';
 import '../student/video_list_screen.dart';
 import '../student/video_player_screen.dart';
+
 import '../teacher/batch_students_screen.dart';
 import '../teacher/teacher_content_list_screen.dart';
 import '../teacher/teacher_courses_screen.dart';
@@ -156,6 +158,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/student',
         builder: (context, state) => const StudentDashboard(),
+      ),
+      GoRoute(
+        path: '/student/my-courses',
+        builder: (context, state) => const MyCoursesScreen(),
       ),
       GoRoute(
         path: '/student/courses',
