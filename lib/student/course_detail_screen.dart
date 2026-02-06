@@ -308,7 +308,6 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
   ) {
     final startDate = batch.startDate;
     final endDate = batch.endDate;
-    final isUpcoming = startDate.isAfter(DateTime.now());
     final isActive = startDate.isBefore(DateTime.now()) && endDate.isAfter(DateTime.now());
     final isClosed = endDate.isBefore(DateTime.now());
 
