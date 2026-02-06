@@ -1,0 +1,429 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../core/theme/app_theme.dart';
+import '../services/teacher_service.dart';
+import 'widgets/teacher_layout.dart';
+
+
+// Provider for batch students
+final batchStudentsProvider = FutureProvider.family<List<Map<String, dynamic>>, String>((ref, batchId) async {
+  return await TeacherService().fetchBatchStudents(batchId);
+});
+
+class BatchStudentsScreen extends ConsumerStatefulWidget {
+  const BatchStudentsScreen({
+    super.key,
+    required this.batchId,
+  });
+
+  final String batchId;
+
+  @override
+  ConsumerState<BatchStudentsScreen> createState() => _BatchStudentsScreenState();
+}
+
+class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
+  String _searchQuery = '';
+  bool _showActiveOnly = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 800;
+    final padding = isMobile ? 16.0 : 32.0;
+    
+    final studentsAsync = ref.watch(batchStudentsProvider(widget.batchId));
+
+    return TeacherLayout(
+      currentRoute: '/teacher/batches/${widget.batchId}/students',
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(padding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Back Button
+            TextButton.icon(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: Icon(Icons.arrow_back, size: 18),
+              label: const Text('Back to Batches'),
+              style: TextButton.styleFrom(
+                foregroundColor: AppTheme.gray700,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Header
+            Text(
+              'Batch Students',
+              style: TextStyle(
+                fontSize: isMobile ? 24 : 32,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.gray900,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'View and manage students in this batch',
+              style: TextStyle(
+                fontSize: isMobile ? 14 : 15,
+                color: AppTheme.gray600,
+              ),
+            ),
+            SizedBox(height: isMobile ? 20 : 32),
+
+            // Search and Filter
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search students...',
+                      prefixIcon: Icon(Icons.search, color: AppTheme.gray400),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppTheme.gray300),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppTheme.gray300),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: AppTheme.success, width: 2),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value.toLowerCase();
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                FilterChip(
+                  label: const Text('Active Only'),
+                  selected: _showActiveOnly,
+                  onSelected: (selected) {
+                    setState(() {
+                      _showActiveOnly = selected;
+                    });
+                  },
+                  backgroundColor: AppTheme.gray100,
+                  selectedColor: AppTheme.success.withOpacity(0.15),
+                  checkmarkColor: AppTheme.success,
+                  labelStyle: TextStyle(
+                    color: _showActiveOnly ? AppTheme.success : AppTheme.gray700,
+                    fontWeight: _showActiveOnly ? FontWeight.w600 : FontWeight.w500,
+                  ),
+                  side: BorderSide(
+                    color: _showActiveOnly ? AppTheme.success : AppTheme.gray200,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: isMobile ? 20 : 24),
+
+            // Students List
+            studentsAsync.when(
+              data: (students) {
+                final filteredStudents = students.where((student) {
+                  // Search filter
+                  if (_searchQuery.isNotEmpty) {
+                    final name = (student['name'] as String? ?? '').toLowerCase();
+                    final email = (student['email'] as String? ?? '').toLowerCase();
+                    if (!name.contains(_searchQuery) && !email.contains(_searchQuery)) {
+                      return false;
+                    }
+                  }
+
+                  // Active filter
+                  if (_showActiveOnly && !(student['is_active'] as bool? ?? true)) {
+                    return false;
+                  }
+
+                  return true;
+                }).toList();
+
+                if (filteredStudents.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(48),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.people_outline,
+                            size: 64,
+                            color: AppTheme.gray300,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            students.isEmpty
+                                ? 'No students enrolled yet'
+                                : 'No students match your search',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: AppTheme.gray500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
+                // Mobile: Card view, Desktop: Table view
+                if (isMobile) {
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: filteredStudents.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      return _buildStudentCard(filteredStudents[index]);
+                    },
+                  );
+                } else {
+                  return _buildStudentTable(filteredStudents);
+                }
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stack) => Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    children: [
+                      Icon(Icons.error_outline, size: 64, color: AppTheme.error),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Failed to load students',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.gray900,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        error.toString(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: AppTheme.gray600),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStudentCard(Map<String, dynamic> student) {
+    final name = student['name'] as String? ?? 'Unknown';
+    final email = student['email'] as String? ?? '';
+    final enrolledAt = student['enrolled_at'] as String?;
+    final isActive = student['is_active'] as bool? ?? true;
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: AppTheme.gray200),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: AppTheme.success.withOpacity(0.1),
+                  child: Text(
+                    name[0].toUpperCase(),
+                    style: TextStyle(
+                      color: AppTheme.success,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.gray900,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        email,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppTheme.gray600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? AppTheme.success.withOpacity(0.1)
+                        : AppTheme.gray200,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    isActive ? 'ACTIVE' : 'INACTIVE',
+                    style: TextStyle(
+                      color: isActive ? AppTheme.success : AppTheme.gray600,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (enrolledAt != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Enrolled: ${_formatDateTime(enrolledAt)}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppTheme.gray500,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStudentTable(List<Map<String, dynamic>> students) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: AppTheme.gray200),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: DataTable(
+          headingRowColor: MaterialStateProperty.all(AppTheme.gray50),
+          columns: [
+            DataColumn(
+              label: Text(
+                'Name',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.gray700,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Text(
+                'Email',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.gray700,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Text(
+                'Enrolled Date',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.gray700,
+                ),
+              ),
+            ),
+            DataColumn(
+              label: Text(
+                'Status',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.gray700,
+                ),
+              ),
+            ),
+          ],
+          rows: students.map((student) {
+            final name = student['name'] as String? ?? 'Unknown';
+            final email = student['email'] as String? ?? '';
+            final enrolledAt = student['enrolled_at'] as String?;
+            final isActive = student['is_active'] as bool? ?? true;
+
+            return DataRow(
+              cells: [
+                DataCell(
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 16,
+                        backgroundColor: AppTheme.success.withOpacity(0.1),
+                        child: Text(
+                          name[0].toUpperCase(),
+                          style: TextStyle(
+                            color: AppTheme.success,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(name),
+                    ],
+                  ),
+                ),
+                DataCell(Text(email)),
+                DataCell(
+                  Text(enrolledAt != null ? _formatDateTime(enrolledAt) : '-'),
+                ),
+                DataCell(
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? AppTheme.success.withOpacity(0.1)
+                          : AppTheme.gray200,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      isActive ? 'ACTIVE' : 'INACTIVE',
+                      style: TextStyle(
+                        color: isActive ? AppTheme.success : AppTheme.gray600,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
+  }
+
+  String _formatDateTime(String dateTimeStr) {
+    final date = DateTime.parse(dateTimeStr);
+    return '${date.day}/${date.month}/${date.year}';
+  }
+}

@@ -147,13 +147,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const UploadNotesScreen(),
       ),
       GoRoute(
-        path: '/teacher/batches/:id/students',
-        builder: (context, state) {
-          final batchId = state.pathParameters['id']!;
-          return BatchStudentsScreen(batchId: batchId);
-        },
-      ),
-      GoRoute(
         path: '/student',
         builder: (context, state) => const StudentDashboard(),
       ),

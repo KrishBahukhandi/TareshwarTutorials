@@ -115,4 +115,76 @@ class TeacherService {
     
     return response.length;
   }
+
+  /// Get batches assigned to a specific teacher with course details
+  Future<List<Map<String, dynamic>>> fetchTeacherBatches(String teacherId) async {
+    final batches = await supabase
+        .from('batches')
+        .select('*, courses(*)')
+        .eq('teacher_id', teacherId)
+        .order('start_date', ascending: false);
+    
+    return batches;
+  }
+
+  /// Get total student count across all teacher's batches
+  Future<int> fetchTeacherStudentCount(String teacherId) async {
+    // Get all batches for this teacher
+    final batches = await supabase
+        .from('batches')
+        .select('id')
+        .eq('teacher_id', teacherId);
+    
+    if (batches.isEmpty) return 0;
+    
+    // Get all enrollments for these batches
+    final batchIds = batches.map((b) => b['id'] as String).toList();
+    
+    final enrollments = await supabase
+        .from('enrollments')
+        .select('id')
+        .inFilter('batch_id', batchIds)
+        .eq('is_active', true);
+    
+    return enrollments.length;
+  }
+
+  /// Get students enrolled in a specific batch
+  Future<List<Map<String, dynamic>>> fetchBatchStudents(String batchId) async {
+    final enrollments = await supabase
+        .from('enrollments')
+        .select('student_id, enrolled_at, is_active')
+        .eq('batch_id', batchId)
+        .eq('is_active', true)
+        .order('enrolled_at', ascending: false);
+    
+    if (enrollments.isEmpty) return [];
+    
+    // Get student profiles
+    final studentIds = enrollments.map((e) => e['student_id'] as String).toList();
+    
+    final students = await supabase
+        .from('profiles')
+        .select('id, name, email')
+        .inFilter('id', studentIds);
+    
+    // Merge enrollment data with student data
+    final result = <Map<String, dynamic>>[];
+    for (final enrollment in enrollments) {
+      final student = students.firstWhere(
+        (s) => s['id'] == enrollment['student_id'],
+        orElse: () => <String, dynamic>{},
+      );
+      
+      if (student.isNotEmpty) {
+        result.add({
+          ...student,
+          'enrolled_at': enrollment['enrolled_at'],
+          'is_active': enrollment['is_active'],
+        });
+      }
+    }
+    
+    return result;
+  }
 }

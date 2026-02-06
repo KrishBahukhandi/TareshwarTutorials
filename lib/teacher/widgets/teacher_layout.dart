@@ -5,10 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../auth/auth_controller.dart';
 import '../../core/theme/app_theme.dart';
 
-/// Modern, clean admin layout with professional sidebar navigation
-/// Responsive: Desktop uses sidebar, Mobile uses drawer
-class AdminLayout extends StatelessWidget {
-  const AdminLayout({
+/// Professional teacher layout with responsive sidebar/drawer navigation
+class TeacherLayout extends StatelessWidget {
+  const TeacherLayout({
     super.key,
     required this.currentRoute,
     required this.child,
@@ -26,7 +25,7 @@ class AdminLayout extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: Text(
-                'EduTech Admin',
+                'EduTech Teacher',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -59,7 +58,7 @@ class AdminLayout extends StatelessWidget {
             body: SafeArea(child: child),
           );
         }
-        
+
         // Desktop layout (width >= 800)
         return Scaffold(
           body: Row(
@@ -70,7 +69,7 @@ class AdminLayout extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: [
-                    _AdminAppBar(),
+                    _TeacherAppBar(),
                     Expanded(child: child),
                   ],
                 ),
@@ -114,23 +113,35 @@ class _SidebarContent extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryBlue.withOpacity(0.1),
+                    color: AppTheme.success.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
                     Icons.school_rounded,
-                    color: AppTheme.primaryBlue,
+                    color: AppTheme.success,
                     size: 24,
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  'EduTech',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.gray900,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'EduTech',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.gray900,
+                      ),
+                    ),
+                    Text(
+                      'Teacher Portal',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppTheme.gray500,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -147,66 +158,47 @@ class _SidebarContent extends StatelessWidget {
                   icon: Icons.dashboard_outlined,
                   activeIcon: Icons.dashboard_rounded,
                   label: 'Dashboard',
-                  route: '/admin',
-                  isActive: currentRoute == '/admin',
-                  isMobile: isMobile,
-                ),
-                const SizedBox(height: 4),
-                _NavItem(
-                  icon: Icons.analytics_outlined,
-                  activeIcon: Icons.analytics_rounded,
-                  label: 'Analytics',
-                  route: '/admin/analytics',
-                  isActive: currentRoute.startsWith('/admin/analytics'),
+                  route: '/teacher',
+                  isActive: currentRoute == '/teacher',
                   isMobile: isMobile,
                 ),
                 const SizedBox(height: 20),
-                _NavSection(title: 'USER MANAGEMENT'),
+                _NavSection(title: 'TEACHING'),
                 const SizedBox(height: 4),
                 _NavItem(
-                  icon: Icons.people_outline,
-                  activeIcon: Icons.people_rounded,
-                  label: 'Students',
-                  route: '/admin/students',
-                  isActive: currentRoute.startsWith('/admin/students'),
-                  isMobile: isMobile,
-                ),
-                _NavItem(
-                  icon: Icons.person_outline,
-                  activeIcon: Icons.person_rounded,
-                  label: 'Teachers',
-                  route: '/admin/teachers',
-                  isActive: currentRoute.startsWith('/admin/teachers'),
+                  icon: Icons.class_outlined,
+                  activeIcon: Icons.class_rounded,
+                  label: 'My Batches',
+                  route: '/teacher/courses',
+                  isActive: currentRoute.startsWith('/teacher/courses') ||
+                      currentRoute.startsWith('/teacher/batches'),
                   isMobile: isMobile,
                 ),
                 const SizedBox(height: 20),
                 _NavSection(title: 'CONTENT'),
                 const SizedBox(height: 4),
                 _NavItem(
-                  icon: Icons.book_outlined,
-                  activeIcon: Icons.book_rounded,
-                  label: 'Courses',
-                  route: '/admin/courses',
-                  isActive: currentRoute.startsWith('/admin/courses'),
+                  icon: Icons.video_library_outlined,
+                  activeIcon: Icons.video_library_rounded,
+                  label: 'Upload Video',
+                  route: '/teacher/videos/upload',
+                  isActive: currentRoute == '/teacher/videos/upload',
                   isMobile: isMobile,
                 ),
                 _NavItem(
-                  icon: Icons.class_outlined,
-                  activeIcon: Icons.class_rounded,
-                  label: 'Batches',
-                  route: '/admin/batches',
-                  isActive: currentRoute.startsWith('/admin/batches'),
+                  icon: Icons.note_outlined,
+                  activeIcon: Icons.note_rounded,
+                  label: 'Upload Notes',
+                  route: '/teacher/notes/upload',
+                  isActive: currentRoute == '/teacher/notes/upload',
                   isMobile: isMobile,
                 ),
-                const SizedBox(height: 20),
-                _NavSection(title: 'OPERATIONS'),
-                const SizedBox(height: 4),
                 _NavItem(
-                  icon: Icons.assignment_outlined,
-                  activeIcon: Icons.assignment_rounded,
-                  label: 'Enrollments',
-                  route: '/admin/enrollments',
-                  isActive: currentRoute.startsWith('/admin/enrollments'),
+                  icon: Icons.folder_outlined,
+                  activeIcon: Icons.folder_rounded,
+                  label: 'My Content',
+                  route: '/teacher/content',
+                  isActive: currentRoute.startsWith('/teacher/content'),
                   isMobile: isMobile,
                 ),
               ],
@@ -273,7 +265,7 @@ class _NavItem extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
             color: isActive
-                ? AppTheme.primaryBlue.withOpacity(0.1)
+                ? AppTheme.success.withOpacity(0.1)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
@@ -282,7 +274,7 @@ class _NavItem extends StatelessWidget {
               Icon(
                 isActive ? activeIcon : icon,
                 size: 20,
-                color: isActive ? AppTheme.primaryBlue : AppTheme.gray600,
+                color: isActive ? AppTheme.success : AppTheme.gray600,
               ),
               const SizedBox(width: 12),
               Text(
@@ -290,7 +282,7 @@ class _NavItem extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                  color: isActive ? AppTheme.primaryBlue : AppTheme.gray700,
+                  color: isActive ? AppTheme.success : AppTheme.gray700,
                 ),
               ),
             ],
@@ -301,7 +293,7 @@ class _NavItem extends StatelessWidget {
   }
 }
 
-class _AdminAppBar extends ConsumerWidget {
+class _TeacherAppBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(

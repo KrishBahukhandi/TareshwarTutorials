@@ -43,10 +43,13 @@ class DashboardOverviewScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isMobile = MediaQuery.of(context).size.width < 800;
+    final padding = isMobile ? 16.0 : 32.0;
+
     return AdminLayout(
       currentRoute: '/admin',
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.all(padding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
