@@ -130,14 +130,32 @@ class _AnalyticsDashboardScreenState
               ),
               const SizedBox(height: 16),
               
-              // Row with two charts
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: _buildUserDistributionChart()),
-                  const SizedBox(width: 16),
-                  Expanded(child: _buildContentDistributionChart()),
-                ],
+              // Responsive chart layout
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isMobile = constraints.maxWidth < 800;
+                  
+                  if (isMobile) {
+                    // Stack charts vertically on mobile
+                    return Column(
+                      children: [
+                        _buildUserDistributionChart(),
+                        const SizedBox(height: 16),
+                        _buildContentDistributionChart(),
+                      ],
+                    );
+                  } else {
+                    // Display side by side on larger screens
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: _buildUserDistributionChart()),
+                        const SizedBox(width: 16),
+                        Expanded(child: _buildContentDistributionChart()),
+                      ],
+                    );
+                  }
+                },
               ),
               const SizedBox(height: 16),
               
@@ -153,48 +171,67 @@ class _AnalyticsDashboardScreenState
   Widget _buildMetricsGrid() {
     return LayoutBuilder(
       builder: (context, constraints) {
+        // Determine layout based on screen width
         final isWide = constraints.maxWidth > 1000;
-        final crossAxisCount = isWide ? 4 : 2;
+        final isMobile = constraints.maxWidth < 600;
         
-        return GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: crossAxisCount,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 16,
-          childAspectRatio: isWide ? 1.8 : 1.5,
+        // Calculate card width based on screen size
+        double cardWidth;
+        if (isMobile) {
+          cardWidth = constraints.maxWidth; // Full width on mobile
+        } else if (isWide) {
+          cardWidth = (constraints.maxWidth - (3 * 16)) / 4; // 4 columns on desktop
+        } else {
+          cardWidth = (constraints.maxWidth - 16) / 2; // 2 columns on tablet
+        }
+        
+        return Wrap(
+          spacing: 16,
+          runSpacing: 16,
           children: [
-            _buildMetricCard(
-              title: 'Total Students',
-              value: _totalStudents.toString(),
-              subtitle: '$_activeStudents active',
-              icon: Icons.school,
-              color: AppTheme.primaryBlue,
-              trend: _activeStudents / (_totalStudents > 0 ? _totalStudents : 1),
+            SizedBox(
+              width: cardWidth,
+              child: _buildMetricCard(
+                title: 'Total Students',
+                value: _totalStudents.toString(),
+                subtitle: '$_activeStudents active',
+                icon: Icons.school,
+                color: AppTheme.primaryBlue,
+                trend: _activeStudents / (_totalStudents > 0 ? _totalStudents : 1),
+              ),
             ),
-            _buildMetricCard(
-              title: 'Total Teachers',
-              value: _totalTeachers.toString(),
-              subtitle: '$_activeTeachers active',
-              icon: Icons.person,
-              color: AppTheme.success,
-              trend: _activeTeachers / (_totalTeachers > 0 ? _totalTeachers : 1),
+            SizedBox(
+              width: cardWidth,
+              child: _buildMetricCard(
+                title: 'Total Teachers',
+                value: _totalTeachers.toString(),
+                subtitle: '$_activeTeachers active',
+                icon: Icons.person,
+                color: AppTheme.success,
+                trend: _activeTeachers / (_totalTeachers > 0 ? _totalTeachers : 1),
+              ),
             ),
-            _buildMetricCard(
-              title: 'Total Courses',
-              value: _totalCourses.toString(),
-              subtitle: '$_publishedCourses published',
-              icon: Icons.book,
-              color: AppTheme.warning,
-              trend: _publishedCourses / (_totalCourses > 0 ? _totalCourses : 1),
+            SizedBox(
+              width: cardWidth,
+              child: _buildMetricCard(
+                title: 'Total Courses',
+                value: _totalCourses.toString(),
+                subtitle: '$_publishedCourses published',
+                icon: Icons.book,
+                color: AppTheme.warning,
+                trend: _publishedCourses / (_totalCourses > 0 ? _totalCourses : 1),
+              ),
             ),
-            _buildMetricCard(
-              title: 'Total Batches',
-              value: _totalBatches.toString(),
-              subtitle: '$_activeBatches active',
-              icon: Icons.groups,
-              color: AppTheme.info,
-              trend: _activeBatches / (_totalBatches > 0 ? _totalBatches : 1),
+            SizedBox(
+              width: cardWidth,
+              child: _buildMetricCard(
+                title: 'Total Batches',
+                value: _totalBatches.toString(),
+                subtitle: '$_activeBatches active',
+                icon: Icons.groups,
+                color: AppTheme.info,
+                trend: _activeBatches / (_totalBatches > 0 ? _totalBatches : 1),
+              ),
             ),
           ],
         );
@@ -219,24 +256,24 @@ class _AnalyticsDashboardScreenState
         side: BorderSide(color: AppTheme.gray200),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: color, size: 24),
+                  child: Icon(icon, color: color, size: 18),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: AppTheme.success.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -244,7 +281,7 @@ class _AnalyticsDashboardScreenState
                   child: Text(
                     '$percentage%',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 9,
                       fontWeight: FontWeight.w600,
                       color: AppTheme.success,
                     ),
@@ -252,31 +289,34 @@ class _AnalyticsDashboardScreenState
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
               value,
               style: TextStyle(
-                fontSize: 28,
+                fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.gray900,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               title,
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
                 color: AppTheme.gray600,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 2),
             Text(
               subtitle,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 9,
                 color: AppTheme.gray500,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

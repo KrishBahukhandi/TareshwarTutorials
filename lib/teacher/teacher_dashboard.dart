@@ -62,55 +62,59 @@ class TeacherDashboard extends ConsumerWidget {
             // Statistics Cards
             LayoutBuilder(
               builder: (context, constraints) {
-                int crossAxisCount;
-                double childAspectRatio;
-
+                // Calculate card width based on screen size
+                double cardWidth;
                 if (constraints.maxWidth < 600) {
-                  crossAxisCount = 1;
-                  childAspectRatio = 2.5;
+                  cardWidth = constraints.maxWidth; // Full width on mobile
                 } else if (constraints.maxWidth < 900) {
-                  crossAxisCount = 2;
-                  childAspectRatio = 1.8;
+                  cardWidth = (constraints.maxWidth - 20) / 2; // 2 columns on tablet
                 } else {
-                  crossAxisCount = 4;
-                  childAspectRatio = 1.3;
+                  cardWidth = (constraints.maxWidth - 60) / 4; // 4 columns on desktop
                 }
 
-                return GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: isMobile ? 12 : 20,
-                  mainAxisSpacing: isMobile ? 12 : 20,
-                  childAspectRatio: childAspectRatio,
+                return Wrap(
+                  spacing: isMobile ? 12 : 20,
+                  runSpacing: isMobile ? 12 : 20,
                   children: [
-                    _buildStatCard(
-                      context: context,
-                      title: 'My Batches',
-                      provider: teacherBatchesCountProvider,
-                      icon: Icons.class_rounded,
-                      color: AppTheme.success,
+                    SizedBox(
+                      width: cardWidth,
+                      child: _buildStatCard(
+                        context: context,
+                        title: 'My Batches',
+                        provider: teacherBatchesCountProvider,
+                        icon: Icons.class_rounded,
+                        color: AppTheme.success,
+                      ),
                     ),
-                    _buildStatCard(
-                      context: context,
-                      title: 'Total Students',
-                      provider: teacherStudentsCountProvider,
-                      icon: Icons.people_rounded,
-                      color: AppTheme.primaryBlue,
+                    SizedBox(
+                      width: cardWidth,
+                      child: _buildStatCard(
+                        context: context,
+                        title: 'Total Students',
+                        provider: teacherStudentsCountProvider,
+                        icon: Icons.people_rounded,
+                        color: AppTheme.primaryBlue,
+                      ),
                     ),
-                    _buildStatCard(
-                      context: context,
-                      title: 'Videos',
-                      count: 0, // TODO: Implement content counts
-                      icon: Icons.video_library_rounded,
-                      color: AppTheme.warning,
+                    SizedBox(
+                      width: cardWidth,
+                      child: _buildStatCard(
+                        context: context,
+                        title: 'Videos',
+                        count: 0, // TODO: Implement content counts
+                        icon: Icons.video_library_rounded,
+                        color: AppTheme.warning,
+                      ),
                     ),
-                    _buildStatCard(
-                      context: context,
-                      title: 'Notes',
-                      count: 0, // TODO: Implement content counts
-                      icon: Icons.note_rounded,
-                      color: AppTheme.info,
+                    SizedBox(
+                      width: cardWidth,
+                      child: _buildStatCard(
+                        context: context,
+                        title: 'Notes',
+                        count: 0, // TODO: Implement content counts
+                        icon: Icons.note_rounded,
+                        color: AppTheme.info,
+                      ),
                     ),
                   ],
                 );
@@ -310,42 +314,33 @@ class _StatCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(icon, color: color, size: 22),
-                ),
-              ],
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: color, size: 22),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.gray900,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppTheme.gray600,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+            const SizedBox(height: 16),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.gray900,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 13,
+                color: AppTheme.gray600,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),

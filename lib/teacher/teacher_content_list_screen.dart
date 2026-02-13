@@ -107,6 +107,8 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
             ),
             child: TabBar(
               controller: _tabController,
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
               labelColor: AppTheme.success,
               unselectedLabelColor: AppTheme.gray600,
               indicatorColor: AppTheme.success,
@@ -122,7 +124,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
               tabs: [
                 Tab(
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.video_library, size: 18),
                       const SizedBox(width: 8),
@@ -136,7 +138,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                 ),
                 Tab(
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.note, size: 18),
                       const SizedBox(width: 8),
@@ -150,7 +152,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                 ),
                 const Tab(
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.folder, size: 18),
                       SizedBox(width: 8),

@@ -110,21 +110,53 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Batches Management',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
+                // Responsive header
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isMobile = constraints.maxWidth < 600;
+                    
+                    if (isMobile) {
+                      // Stack vertically on mobile
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            'Batches Management',
+                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
-                    ),
-                    FilledButton.icon(
-                      onPressed: () => context.go('/admin/batches/new'),
-                      icon: const Icon(Icons.add, size: 18),
-                      label: const Text('Add Batch'),
-                    ),
-                  ],
+                          const SizedBox(height: 12),
+                          FilledButton.icon(
+                            onPressed: () => context.go('/admin/batches/new'),
+                            icon: const Icon(Icons.add, size: 18),
+                            label: const Text('Add Batch'),
+                          ),
+                        ],
+                      );
+                    } else {
+                      // Row layout on tablet/desktop
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Batches Management',
+                              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          FilledButton.icon(
+                            onPressed: () => context.go('/admin/batches/new'),
+                            icon: const Icon(Icons.add, size: 18),
+                            label: const Text('Add Batch'),
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 ),
                 const SizedBox(height: 8),
                 Text(
