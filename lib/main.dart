@@ -9,12 +9,6 @@ import 'router/app_router.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (kSupabaseUrl.isEmpty || kSupabaseAnonKey.isEmpty) {
-    throw Exception(
-      'Missing SUPABASE_URL or SUPABASE_ANON_KEY. Provide them via --dart-define.',
-    );
-  }
-
   await Supabase.initialize(
     url: kSupabaseUrl,
     anonKey: kSupabaseAnonKey,
