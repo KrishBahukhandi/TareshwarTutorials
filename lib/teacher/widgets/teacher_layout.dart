@@ -25,7 +25,7 @@ class TeacherLayout extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: Text(
-                'EduTech Teacher',
+                'Tareshwar Tutorials Teacher',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -127,7 +127,7 @@ class _SidebarContent extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'EduTech',
+                      'Tareshwar Tutorials',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

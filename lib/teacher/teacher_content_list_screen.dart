@@ -202,11 +202,10 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
   Widget _buildVideosTab(AsyncValue videos, bool isMobile, double padding) {
     return videos.when(
       data: (items) {
-        final List<dynamic> videoList = items as List<dynamic>;
+        final videoList = items as List;
         final filtered = videoList.where((video) {
           if (_searchQuery.isEmpty) return true;
-          final title = (video as Map<String, dynamic>)['title']?.toString() ?? '';
-          return title.toLowerCase().contains(_searchQuery);
+          return (video.title as String).toLowerCase().contains(_searchQuery);
         }).toList();
 
         if (filtered.isEmpty) {
@@ -251,11 +250,10 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
   Widget _buildNotesTab(AsyncValue notes, bool isMobile, double padding) {
     return notes.when(
       data: (items) {
-        final List<dynamic> notesList = items as List<dynamic>;
+        final notesList = items as List;
         final filtered = notesList.where((note) {
           if (_searchQuery.isEmpty) return true;
-          final title = (note as Map<String, dynamic>)['title']?.toString() ?? '';
-          return title.toLowerCase().contains(_searchQuery);
+          return (note.title as String).toLowerCase().contains(_searchQuery);
         }).toList();
 
         if (filtered.isEmpty) {
@@ -434,7 +432,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    (video as Map<String, dynamic>)['title']?.toString() ?? 'Untitled',
+                    video.title?.toString() ?? 'Untitled',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -445,7 +443,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Batch ID: ${video['batch_id']?.toString() ?? 'N/A'}',
+                    'Batch ID: ${video.batchId?.toString() ?? 'N/A'}',
                     style: TextStyle(
                       fontSize: 13,
                       color: AppTheme.gray600,
@@ -469,15 +467,14 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                   ),
                   onTap: () {
                     Future.delayed(Duration.zero, () {
-                      final videoMap = video as Map<String, dynamic>;
                       _confirmDelete(
                         context,
                         'video',
-                        videoMap['title']?.toString() ?? 'this video',
+                        video.title?.toString() ?? 'this video',
                         () async {
                           await ref.read(videoServiceProvider).deleteVideo(
-                            videoId: videoMap['id'] as String,
-                            storagePath: videoMap['video_url'] as String,
+                            videoId: video.id as String,
+                            storagePath: video.videoUrl as String,
                           );
                           ref.invalidate(videoListProvider);
                         },
@@ -525,7 +522,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    (note as Map<String, dynamic>)['title']?.toString() ?? 'Untitled',
+                    note.title?.toString() ?? 'Untitled',
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -536,7 +533,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Batch ID: ${note['batch_id']?.toString() ?? 'N/A'}',
+                    'Batch ID: ${note.batchId?.toString() ?? 'N/A'}',
                     style: TextStyle(
                       fontSize: 13,
                       color: AppTheme.gray600,
@@ -560,15 +557,14 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                   ),
                   onTap: () {
                     Future.delayed(Duration.zero, () {
-                      final noteMap = note as Map<String, dynamic>;
                       _confirmDelete(
                         context,
                         'note',
-                        noteMap['title']?.toString() ?? 'this note',
+                        note.title?.toString() ?? 'this note',
                         () async {
                           await ref.read(notesServiceProvider).deleteNote(
-                            noteId: noteMap['id'] as String,
-                            storagePath: noteMap['file_url'] as String,
+                            noteId: note.id as String,
+                            storagePath: note.fileUrl as String,
                           );
                           ref.invalidate(notesListProvider);
                         },

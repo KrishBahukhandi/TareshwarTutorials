@@ -26,7 +26,7 @@ class StudentLayout extends ConsumerWidget {
           // Mobile layout with drawer
           return Scaffold(
             appBar: AppBar(
-              title: const Text('EduTech Student'),
+              title: const Text('Tareshwar Tutorials Student'),
               backgroundColor: AppTheme.primaryBlue,
               foregroundColor: Colors.white,
               elevation: 0,
@@ -156,7 +156,7 @@ class _SidebarContent extends ConsumerWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'EduTech',
+                      'Tareshwar Tutorials',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,

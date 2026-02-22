@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../core/theme/app_theme.dart';
 import '../providers/student_providers.dart';
@@ -194,7 +195,9 @@ class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
     final courseDescription = course?['description'] ?? 'No description';
     final startDate = batch != null ? DateTime.parse(batch['start_date']) : null;
     final endDate = batch != null ? DateTime.parse(batch['end_date']) : null;
-    
+
+    final batchId = batch?['id'] as String?;
+
     // Determine status
     final isActive = endDate != null && endDate.isAfter(DateTime.now());
     final statusColor = isActive ? AppTheme.success : AppTheme.gray500;
@@ -207,9 +210,7 @@ class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
         side: BorderSide(color: AppTheme.gray200),
       ),
       child: InkWell(
-        onTap: () {
-          // TODO: Navigate to course content
-        },
+        onTap: batchId == null ? null : () => context.go('/student/batch/$batchId'),
         borderRadius: BorderRadius.circular(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

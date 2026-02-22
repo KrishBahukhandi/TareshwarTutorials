@@ -22,6 +22,7 @@ import '../admin/teachers/edit_teacher_screen.dart';
 import '../auth/auth_controller.dart';
 import '../auth/login_screen.dart';
 import '../auth/signup_screen.dart';
+import '../student/batch_content_screen.dart';
 import '../student/course_detail_screen.dart';
 import '../student/course_list_screen.dart';
 import '../student/my_courses_screen.dart';
@@ -162,6 +163,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/student/my-courses',
         builder: (context, state) => const MyCoursesScreen(),
+      ),
+      GoRoute(
+        path: '/student/batch/:id',
+        builder: (context, state) => BatchContentScreen(
+          batchId: state.pathParameters['id']!,
+        ),
       ),
       GoRoute(
         path: '/student/courses',

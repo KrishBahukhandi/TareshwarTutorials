@@ -276,6 +276,103 @@ class AppTheme {
           borderRadius: BorderRadius.circular(8),
         ),
       ),
+
+      // SnackBar
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: gray900,
+        contentTextStyle: const TextStyle(color: Colors.white, fontSize: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+
+      // Bottom sheet
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+
+      // Progress indicator
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: primaryBlue,
+        linearTrackColor: gray200,
+      ),
+    );
+  }
+
+  static ThemeData dark() {
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.dark(
+        primary: primaryBlueLight,
+        secondary: gray300,
+        surface: const Color(0xFF0B1220),
+        surfaceContainerHighest: const Color(0xFF111A2E),
+        onSurface: const Color(0xFFE5E7EB),
+        onSurfaceVariant: const Color(0xFFB6C2D1),
+        outline: const Color(0xFF2A3550),
+        error: error,
+      ),
+      scaffoldBackgroundColor: const Color(0xFF070B14),
+      appBarTheme: AppBarTheme(
+        elevation: 0,
+        centerTitle: false,
+        backgroundColor: const Color(0xFF070B14),
+        foregroundColor: const Color(0xFFE5E7EB),
+        iconTheme: const IconThemeData(color: Color(0xFFE5E7EB)),
+        titleTextStyle: const TextStyle(
+          color: Color(0xFFE5E7EB),
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        color: const Color(0xFF0B1220),
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: Color(0xFF1F2A44), width: 1),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFF0B1220),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFF2A3550)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFF2A3550)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: primaryBlueLight, width: 2),
+        ),
+        labelStyle: const TextStyle(color: Color(0xFFB6C2D1), fontSize: 14),
+        hintStyle: const TextStyle(color: Color(0xFF8FA3BD), fontSize: 14),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: const Color(0xFF111A2E),
+        contentTextStyle: const TextStyle(color: Color(0xFFE5E7EB), fontSize: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: const Color(0xFF0B1220),
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: primaryBlueLight,
+        linearTrackColor: Color(0xFF1F2A44),
+      ),
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../auth/auth_controller.dart';
@@ -98,7 +100,8 @@ class VideoUploadController extends StateNotifier<UploadState> {
   Future<void> uploadVideo({
     required String batchId,
     required String title,
-    required String filePath,
+    required Uint8List fileBytes,
+    required String fileName,
     required int durationSeconds,
   }) async {
     final profile = ref.read(profileProvider);
@@ -107,15 +110,15 @@ class VideoUploadController extends StateNotifier<UploadState> {
     state = state.copyWith(status: UploadStatus.uploading, progress: 0);
     try {
       final storage = ref.read(storageServiceProvider);
-      final storagePath = storage.buildStoragePath(
+      final storagePath = storage.buildStoragePathFromName(
         folder: batchId,
-        filePath: filePath,
+        fileName: fileName,
       );
 
-      final uploadedPath = await storage.uploadFile(
+      final uploadedPath = await storage.uploadFileBytes(
         bucket: 'recorded-videos',
-        filePath: filePath,
         storagePath: storagePath,
+        bytes: fileBytes,
         contentType: 'video/mp4',
         onProgress: (progress) {
           state = state.copyWith(progress: progress);
@@ -151,7 +154,8 @@ class NotesUploadController extends StateNotifier<UploadState> {
   Future<void> uploadNote({
     required String batchId,
     required String title,
-    required String filePath,
+    required Uint8List fileBytes,
+    required String fileName,
   }) async {
     final profile = ref.read(profileProvider);
     if (profile == null) return;
@@ -159,15 +163,15 @@ class NotesUploadController extends StateNotifier<UploadState> {
     state = state.copyWith(status: UploadStatus.uploading, progress: 0);
     try {
       final storage = ref.read(storageServiceProvider);
-      final storagePath = storage.buildStoragePath(
+      final storagePath = storage.buildStoragePathFromName(
         folder: batchId,
-        filePath: filePath,
+        fileName: fileName,
       );
 
-      final uploadedPath = await storage.uploadFile(
+      final uploadedPath = await storage.uploadFileBytes(
         bucket: 'notes-pdfs',
-        filePath: filePath,
         storagePath: storagePath,
+        bytes: fileBytes,
         contentType: 'application/pdf',
         onProgress: (progress) {
           state = state.copyWith(progress: progress);

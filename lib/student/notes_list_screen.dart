@@ -5,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../core/theme/app_theme.dart';
 import '../services/student_service.dart';
 import '../services/supabase_client.dart';
+import '../services/notes_service.dart';
+import '../services/storage_service.dart';
 import 'widgets/student_layout.dart';
 
 // Provider for student notes
@@ -129,7 +131,7 @@ class _NotesListScreenState extends ConsumerState<NotesListScreen> {
     final batch = note['batches'] as Map<String, dynamic>?;
     final course = batch?['courses'] as Map<String, dynamic>?;
     final courseName = course?['title']?.toString() ?? 'Unknown Course';
-    final fileUrl = note['file_url'] as String?;
+    final storagePath = note['file_url'] as String?;
 
     return Card(
       elevation: 0,
@@ -189,16 +191,29 @@ class _NotesListScreenState extends ConsumerState<NotesListScreen> {
 
             // Download Button
             IconButton(
-              onPressed: fileUrl != null
+              onPressed: storagePath != null
                   ? () async {
-                      final uri = Uri.parse(fileUrl);
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri, mode: LaunchMode.externalApplication);
-                      } else {
+                      try {
+                        final notesService = NotesService(StorageService());
+                        final signedUrl = await notesService.createSignedUrl(storagePath);
+                        final uri = Uri.parse(signedUrl);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        } else {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('Unable to open file'),
+                                backgroundColor: AppTheme.error,
+                              ),
+                            );
+                          }
+                        }
+                      } catch (e) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: const Text('Unable to open file'),
+                              content: Text('Failed to open note: $e'),
                               backgroundColor: AppTheme.error,
                             ),
                           );
@@ -208,7 +223,7 @@ class _NotesListScreenState extends ConsumerState<NotesListScreen> {
                   : null,
               icon: Icon(
                 Icons.download,
-                color: fileUrl != null ? AppTheme.warning : AppTheme.gray400,
+                color: storagePath != null ? AppTheme.warning : AppTheme.gray400,
               ),
               tooltip: 'Download',
             ),

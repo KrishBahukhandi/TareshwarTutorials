@@ -21,21 +21,22 @@ class AdminLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final theme = Theme.of(context);
+        final cs = theme.colorScheme;
+
         // Mobile layout (width < 800)
         if (constraints.maxWidth < 800) {
           return Scaffold(
             appBar: AppBar(
               title: Text(
-                'EduTech Admin',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.gray900,
+                'Admin',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-              backgroundColor: Colors.white,
+              backgroundColor: cs.surface,
+              foregroundColor: cs.onSurface,
               elevation: 0,
-              iconTheme: IconThemeData(color: AppTheme.gray900),
               actions: [
                 Consumer(
                   builder: (context, ref, _) {
@@ -59,14 +60,13 @@ class AdminLayout extends StatelessWidget {
             body: SafeArea(child: child),
           );
         }
-        
+
         // Desktop layout (width >= 800)
         return Scaffold(
+          backgroundColor: cs.surface,
           body: Row(
             children: [
-              // Sidebar
               _SidebarContent(currentRoute: currentRoute, isMobile: false),
-              // Main content area
               Expanded(
                 child: Column(
                   children: [
@@ -94,14 +94,17 @@ class _SidebarContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return Container(
       width: isMobile ? null : 260,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cs.surface,
         border: isMobile
             ? null
             : Border(
-                right: BorderSide(color: AppTheme.gray200, width: 1),
+                right: BorderSide(color: cs.outlineVariant, width: 1),
               ),
       ),
       child: Column(
@@ -114,29 +117,32 @@ class _SidebarContent extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryBlue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: cs.primary.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
                     Icons.school_rounded,
-                    color: AppTheme.primaryBlue,
-                    size: 24,
+                    color: cs.primary,
+                    size: 22,
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text(
-                  'EduTech',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.gray900,
+                Expanded(
+                  child: Text(
+                    'Tareshwar Tutorials',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: cs.onSurface,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
 
-          Divider(height: 1, color: AppTheme.gray200),
+          Divider(height: 1, color: cs.outlineVariant),
 
           // Navigation items
           Expanded(
@@ -225,15 +231,17 @@ class _NavSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
       child: Text(
         title,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: AppTheme.gray500,
-          letterSpacing: 0.5,
+        style: theme.textTheme.labelMedium?.copyWith(
+          fontWeight: FontWeight.w700,
+          color: cs.onSurfaceVariant,
+          letterSpacing: 0.8,
         ),
       ),
     );
@@ -259,38 +267,41 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    final activeColor = cs.primary;
+    final inactiveColor = cs.onSurfaceVariant;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
           context.go(route);
           if (isMobile) {
-            Navigator.of(context).pop(); // Close drawer on mobile
+            Navigator.of(context).pop();
           }
         },
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: isActive
-                ? AppTheme.primaryBlue.withOpacity(0.1)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            color: isActive ? activeColor.withOpacity(0.12) : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
           ),
           child: Row(
             children: [
               Icon(
                 isActive ? activeIcon : icon,
                 size: 20,
-                color: isActive ? AppTheme.primaryBlue : AppTheme.gray600,
+                color: isActive ? activeColor : inactiveColor,
               ),
               const SizedBox(width: 12),
               Text(
                 label,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                  color: isActive ? AppTheme.primaryBlue : AppTheme.gray700,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
+                  color: isActive ? activeColor : cs.onSurface,
                 ),
               ),
             ],
@@ -304,12 +315,15 @@ class _NavItem extends StatelessWidget {
 class _AdminAppBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return Container(
       height: 64,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cs.surface,
         border: Border(
-          bottom: BorderSide(color: AppTheme.gray200, width: 1),
+          bottom: BorderSide(color: cs.outlineVariant, width: 1),
         ),
       ),
       child: Padding(
@@ -325,12 +339,12 @@ class _AdminAppBar extends ConsumerWidget {
                   context.go('/login');
                 }
               },
-              icon: Icon(Icons.logout, size: 18, color: AppTheme.gray700),
+              icon: Icon(Icons.logout, size: 18, color: cs.onSurfaceVariant),
               label: Text(
                 'Logout',
-                style: TextStyle(
-                  color: AppTheme.gray700,
-                  fontWeight: FontWeight.w500,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: cs.onSurface,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),

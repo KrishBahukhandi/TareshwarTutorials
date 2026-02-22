@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,7 +29,7 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _durationController = TextEditingController();
-  String? _filePath;
+  Uint8List? _fileBytes;
   String? _fileName;
   String? _batchId;
 
@@ -269,8 +271,8 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: _filePath == null ? AppTheme.gray300 : AppTheme.success,
-                            width: _filePath == null ? 1 : 2,
+                            color: _fileBytes == null ? AppTheme.gray300 : AppTheme.success,
+                            width: _fileBytes == null ? 1 : 2,
                           ),
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -280,10 +282,11 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
                               onTap: () async {
                                 final result = await FilePicker.platform.pickFiles(
                                   type: FileType.video,
+                                  withData: true,
                                 );
-                                if (result?.files.single.path != null) {
+                                if (result != null && result.files.single.bytes != null) {
                                   setState(() {
-                                    _filePath = result!.files.single.path;
+                                    _fileBytes = result.files.single.bytes;
                                     _fileName = result.files.single.name;
                                   });
                                 }
@@ -294,19 +297,19 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
                                 child: Column(
                                   children: [
                                     Icon(
-                                      _filePath == null ? Icons.cloud_upload : Icons.check_circle,
+                                      _fileBytes == null ? Icons.cloud_upload : Icons.check_circle,
                                       size: 48,
-                                      color: _filePath == null ? AppTheme.gray400 : AppTheme.success,
+                                      color: _fileBytes == null ? AppTheme.gray400 : AppTheme.success,
                                     ),
                                     const SizedBox(height: 12),
                                     Text(
-                                      _filePath == null 
+                                      _fileBytes == null 
                                           ? 'Click to select video file' 
                                           : 'Video selected',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
-                                        color: _filePath == null ? AppTheme.gray700 : AppTheme.success,
+                                        color: _fileBytes == null ? AppTheme.gray700 : AppTheme.success,
                                       ),
                                     ),
                                     if (_fileName != null) ...[
@@ -322,7 +325,7 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
                                         textAlign: TextAlign.center,
                                       ),
                                     ],
-                                    if (_filePath == null) ...[
+                                    if (_fileBytes == null) ...[
                                       const SizedBox(height: 8),
                                       Text(
                                         'Supported formats: MP4, MOV, AVI',
@@ -397,7 +400,7 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
                                     return;
                                   }
 
-                                  if (_filePath == null) {
+                                  if (_fileBytes == null) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: const Text('Please select a video file'),
@@ -413,15 +416,37 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
                                   await ref.read(videoUploadProvider.notifier).uploadVideo(
                                         batchId: _batchId!,
                                         title: title,
-                                        filePath: _filePath!,
+                                        fileBytes: _fileBytes!,
+                                        fileName: _fileName!,
                                         durationSeconds: duration,
                                       );
 
-                                  if (uploadState.status == UploadStatus.success && mounted) {
+                                  // Read the LATEST state after upload completes
+                                  final result = ref.read(videoUploadProvider);
+                                  if (!mounted) return;
+
+                                  if (result.status == UploadStatus.success) {
+                                    // Reset the form
+                                    _formKey.currentState!.reset();
+                                    _titleController.clear();
+                                    _durationController.clear();
+                                    setState(() {
+                                      _fileBytes = null;
+                                      _fileName = null;
+                                      _batchId = null;
+                                    });
+
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: const Text('Video uploaded successfully!'),
+                                        content: const Row(
+                                          children: [
+                                            Icon(Icons.check_circle, color: Colors.white),
+                                            SizedBox(width: 12),
+                                            Text('Video uploaded successfully!'),
+                                          ],
+                                        ),
                                         backgroundColor: AppTheme.success,
+                                        duration: const Duration(seconds: 3),
                                       ),
                                     );
                                     context.go('/teacher/content');
