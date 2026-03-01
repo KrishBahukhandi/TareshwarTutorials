@@ -10,7 +10,7 @@ class VideoService {
   Future<List<RecordedVideo>> fetchForTeacher(String teacherId) async {
     final data = await supabase
         .from('recorded_videos')
-        .select()
+        .select('*, batches(*, courses(*))')
         .eq('uploaded_by', teacherId)
         .order('created_at', ascending: false);
     return data.map<RecordedVideo>((row) => RecordedVideo.fromMap(row)).toList();
@@ -19,7 +19,7 @@ class VideoService {
   Future<List<RecordedVideo>> fetchForStudent() async {
     final data = await supabase
         .from('recorded_videos')
-        .select()
+        .select('*, batches(*, courses(*))')
         .order('created_at', ascending: false);
     return data.map<RecordedVideo>((row) => RecordedVideo.fromMap(row)).toList();
   }
@@ -55,7 +55,7 @@ class VideoService {
     return _storageService.createSignedUrl(
       bucket: 'recorded-videos',
       storagePath: storagePath,
-      expiresInSeconds: 3600,
+      expiresInSeconds: 21600, // 6 hours
     );
   }
 }

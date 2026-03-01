@@ -31,7 +31,7 @@ class TeacherDashboard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isMobile = MediaQuery.of(context).size.width < 800;
     final padding = isMobile ? 16.0 : 32.0;
-    final user = ref.watch(authControllerProvider);
+    ref.watch(authControllerProvider); // Ensure auth state is tracked
 
     return TeacherLayout(
       currentRoute: '/teacher',

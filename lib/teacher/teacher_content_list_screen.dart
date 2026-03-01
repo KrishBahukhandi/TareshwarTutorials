@@ -443,7 +443,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Batch ID: ${video.batchId?.toString() ?? 'N/A'}',
+                    _formatContentSubtitle(video.courseName, video.batchName),
                     style: TextStyle(
                       fontSize: 13,
                       color: AppTheme.gray600,
@@ -533,7 +533,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Batch ID: ${note.batchId?.toString() ?? 'N/A'}',
+                    _formatContentSubtitle(note.courseName, note.batchName),
                     style: TextStyle(
                       fontSize: 13,
                       color: AppTheme.gray600,
@@ -578,6 +578,15 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
         ),
       ),
     );
+  }
+
+  String _formatContentSubtitle(dynamic courseName, dynamic batchName) {
+    final course = courseName?.toString();
+    final batch = batchName?.toString();
+    if (course != null && batch != null) return '$course · $batch';
+    if (course != null) return course;
+    if (batch != null) return 'Batch: $batch';
+    return 'No batch info';
   }
 
   Widget _buildEmptyState({

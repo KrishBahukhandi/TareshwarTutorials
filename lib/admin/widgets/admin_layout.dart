@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../auth/auth_controller.dart';
-import '../../core/theme/app_theme.dart';
 
 /// Modern, clean admin layout with professional sidebar navigation
 /// Responsive: Desktop uses sidebar, Mobile uses drawer

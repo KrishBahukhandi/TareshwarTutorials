@@ -418,10 +418,6 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
     );
   }
 
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
-
   String _formatDateTime(String dateTimeStr) {
     final date = DateTime.parse(dateTimeStr);
     return '${date.day}/${date.month}/${date.year}';
