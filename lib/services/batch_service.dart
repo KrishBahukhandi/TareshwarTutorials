@@ -51,6 +51,33 @@ class BatchService {
     return data.map<Batch>((row) => Batch.fromMap(row)).toList();
   }
 
+  Future<List<BatchWithCourse>> fetchAllBatchesWithCourse() async {
+    final data = await supabase
+        .from('batches')
+        .select(
+          'id,course_id,teacher_id,start_date,end_date,seat_limit,created_at,'
+          'courses:course_id (id,title,description,price,created_by,is_published,created_at)',
+        )
+        .order('start_date', ascending: false);
+
+    return data.map<BatchWithCourse>((row) {
+      final batch = Batch.fromMap(row);
+      final courseData = row['courses'];
+      final course = courseData != null
+          ? Course.fromMap(courseData as Map<String, dynamic>)
+          : Course(
+              id: row['course_id'] as String,
+              title: 'Unknown Course',
+              description: '',
+              price: 0,
+              createdBy: '',
+              isPublished: false,
+              createdAt: DateTime.now(),
+            );
+      return BatchWithCourse(batch: batch, course: course);
+    }).toList();
+  }
+
   Future<Batch> fetchBatchById(String batchId) async {
     final data = await supabase
         .from('batches')

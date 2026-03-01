@@ -8,10 +8,8 @@ import '../../services/batch_service.dart';
 import '../../services/enrollment_service.dart';
 import '../widgets/admin_layout.dart';
 
-final batchesProvider = FutureProvider<List<BatchWithCourse>>((ref) async {
-  // For now get all batches - ideally would fetch with course info
-  // This is a simplified version - in production you'd fetch with course details
-  return [];
+final batchesWithCourseProvider = FutureProvider<List<BatchWithCourse>>((ref) async {
+  return await BatchService().fetchAllBatchesWithCourse();
 });
 
 class EnrollmentManagementScreen extends ConsumerStatefulWidget {
@@ -108,8 +106,8 @@ class _EnrollmentManagementScreenState
               ],
             ),
             const SizedBox(height: 16),
-            FutureBuilder<List<dynamic>>(
-              future: BatchService().fetchAllBatches(),
+            FutureBuilder<List<BatchWithCourse>>(
+              future: BatchService().fetchAllBatchesWithCourse(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -134,11 +132,14 @@ class _EnrollmentManagementScreenState
                     hintText: 'Choose a batch to manage enrollments',
                     prefixIcon: Icon(Icons.search, size: 20),
                   ),
-                  items: batches.map((batch) {
+                  items: batches.map((bwc) {
+                    final start = '${bwc.batch.startDate.day}/${bwc.batch.startDate.month}/${bwc.batch.startDate.year}';
+                    final end = '${bwc.batch.endDate.day}/${bwc.batch.endDate.month}/${bwc.batch.endDate.year}';
                     return DropdownMenuItem<String>(
-                      value: batch.id,
+                      value: bwc.batch.id,
                       child: Text(
-                        'Batch ${batch.id.substring(0, 8)} - Seats: ${batch.seatLimit}',
+                        '${bwc.course.title} ($start – $end) · ${bwc.batch.seatLimit} seats',
+                        overflow: TextOverflow.ellipsis,
                       ),
                     );
                   }).toList(),
@@ -557,9 +558,9 @@ class _EnrollmentManagementScreenState
 
   Future<void> _showMoveStudentDialog(String studentId) async {
     // Get all batches except current one
-    final allBatches = await BatchService().fetchAllBatches();
+    final allBatches = await BatchService().fetchAllBatchesWithCourse();
     final otherBatches =
-        allBatches.where((b) => b.id != _selectedBatchId).toList();
+        allBatches.where((b) => b.batch.id != _selectedBatchId).toList();
 
     if (!mounted) return;
 
@@ -580,11 +581,12 @@ class _EnrollmentManagementScreenState
             shrinkWrap: true,
             itemCount: otherBatches.length,
             itemBuilder: (context, index) {
-              final batch = otherBatches[index];
+              final bwc = otherBatches[index];
+              final start = '${bwc.batch.startDate.day}/${bwc.batch.startDate.month}/${bwc.batch.startDate.year}';
               return ListTile(
-                title: Text('Batch ${batch.id.substring(0, 8)}'),
-                subtitle: Text('Seats: ${batch.seatLimit}'),
-                onTap: () => Navigator.pop(context, batch.id),
+                title: Text(bwc.course.title),
+                subtitle: Text('From $start · ${bwc.batch.seatLimit} seats'),
+                onTap: () => Navigator.pop(context, bwc.batch.id),
               );
             },
           ),
