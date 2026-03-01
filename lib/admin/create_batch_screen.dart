@@ -78,7 +78,7 @@ class _CreateBatchScreenState extends ConsumerState<CreateBatchScreen> {
                     children: [
               courses.when(
                 data: (items) => DropdownButtonFormField<Course>(
-                  value: _selectedCourse,
+                  initialValue: _selectedCourse,
                   items: items
                       .map((course) => DropdownMenuItem(
                             value: course,
@@ -100,7 +100,7 @@ class _CreateBatchScreenState extends ConsumerState<CreateBatchScreen> {
                     return const Text('No active teachers available.');
                   }
                   return DropdownButtonFormField<TeacherProfile>(
-                    value: _selectedTeacher,
+                    initialValue: _selectedTeacher,
                     items: activeTeachers
                         .map((teacher) => DropdownMenuItem(
                               value: teacher,

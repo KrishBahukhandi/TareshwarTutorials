@@ -238,7 +238,7 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
                               ),
                               child: ListView.separated(
                                 itemCount: _paginatedBatches.length,
-                                separatorBuilder: (_, __) => const Divider(height: 1),
+                                separatorBuilder: (_, _) => const Divider(height: 1),
                                 itemBuilder: (context, index) {
                                   final bwc = _paginatedBatches[index];
                                   return _buildBatchTile(bwc);

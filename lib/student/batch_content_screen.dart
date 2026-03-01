@@ -206,7 +206,7 @@ class _VideosTab extends StatelessWidget {
 
         return ListView.separated(
           itemCount: items.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          separatorBuilder: (_, _) => const SizedBox(height: 12),
           itemBuilder: (context, i) {
             final v = items[i];
             final title = v['title']?.toString() ?? 'Untitled';
@@ -282,7 +282,7 @@ class _NotesTab extends StatelessWidget {
 
         return ListView.separated(
           itemCount: items.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          separatorBuilder: (_, _) => const SizedBox(height: 12),
           itemBuilder: (context, i) {
             final n = items[i];
             final title = n['title']?.toString() ?? 'Untitled';

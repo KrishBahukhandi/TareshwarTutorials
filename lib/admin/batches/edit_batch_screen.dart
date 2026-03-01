@@ -238,7 +238,7 @@ class _EditBatchScreenState extends State<EditBatchScreen> {
                           ),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
-                            value: _selectedCourseId,
+                            initialValue: _selectedCourseId,
                             decoration: const InputDecoration(
                               hintText: 'Select course',
                               prefixIcon: Icon(Icons.book, size: 20),
@@ -266,7 +266,7 @@ class _EditBatchScreenState extends State<EditBatchScreen> {
                           ),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
-                            value: _selectedTeacherId,
+                            initialValue: _selectedTeacherId,
                             decoration: const InputDecoration(
                               hintText: 'Select teacher',
                               prefixIcon: Icon(Icons.person, size: 20),

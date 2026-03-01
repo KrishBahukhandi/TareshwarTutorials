@@ -387,7 +387,7 @@ class _VideoPlayerScreenState extends ConsumerState<VideoPlayerScreen> {
             // Position indicator
             ValueListenableBuilder(
               valueListenable: _controller!,
-              builder: (_, value, __) {
+              builder: (_, value, _) {
                 final pos = value.position;
                 final dur = value.duration;
                 return Text(

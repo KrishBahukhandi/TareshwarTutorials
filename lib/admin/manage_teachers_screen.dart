@@ -228,7 +228,7 @@ class _ManageTeachersScreenState extends ConsumerState<ManageTeachersScreen> {
                               ),
                               child: ListView.separated(
                                 itemCount: _paginatedTeachers.length,
-                                separatorBuilder: (_, __) => const Divider(height: 1),
+                                separatorBuilder: (_, _) => const Divider(height: 1),
                                 itemBuilder: (context, index) {
                                   final teacher = _paginatedTeachers[index];
                                   return _buildTeacherTile(teacher);

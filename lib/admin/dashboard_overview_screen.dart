@@ -119,7 +119,7 @@ class DashboardOverviewScreen extends ConsumerWidget {
                             onTap: () => context.go('/admin/students'),
                           ),
                           loading: () => const _LoadingCard(title: 'Total Students'),
-                          error: (_, __) => const _ErrorCard(title: 'Total Students'),
+                          error: (_, _) => const _ErrorCard(title: 'Total Students'),
                         ),
 
                     // Teachers Card
@@ -136,7 +136,7 @@ class DashboardOverviewScreen extends ConsumerWidget {
                             );
                           },
                           loading: () => const _LoadingCard(title: 'Total Teachers'),
-                          error: (_, __) => const _ErrorCard(title: 'Total Teachers'),
+                          error: (_, _) => const _ErrorCard(title: 'Total Teachers'),
                         ),
 
                     // Courses Card
@@ -150,7 +150,7 @@ class DashboardOverviewScreen extends ConsumerWidget {
                             onTap: () => context.go('/admin/courses'),
                           ),
                           loading: () => const _LoadingCard(title: 'Total Courses'),
-                          error: (_, __) => const _ErrorCard(title: 'Total Courses'),
+                          error: (_, _) => const _ErrorCard(title: 'Total Courses'),
                         ),
 
                     // Batches Card
@@ -164,7 +164,7 @@ class DashboardOverviewScreen extends ConsumerWidget {
                             onTap: () => context.go('/admin/batches'),
                           ),
                           loading: () => const _LoadingCard(title: 'Total Batches'),
-                          error: (_, __) => const _ErrorCard(title: 'Total Batches'),
+                          error: (_, _) => const _ErrorCard(title: 'Total Batches'),
                         ),
 
                     // Enrollments Card
@@ -178,7 +178,7 @@ class DashboardOverviewScreen extends ConsumerWidget {
                             onTap: () => context.go('/admin/enrollments'),
                           ),
                           loading: () => const _LoadingCard(title: 'Total Enrollments'),
-                          error: (_, __) => const _ErrorCard(title: 'Total Enrollments'),
+                          error: (_, _) => const _ErrorCard(title: 'Total Enrollments'),
                         ),
                   ],
                 );

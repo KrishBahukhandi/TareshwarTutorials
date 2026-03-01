@@ -180,7 +180,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: filteredStudents.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       return _buildStudentCard(filteredStudents[index]);
                     },
@@ -320,7 +320,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          headingRowColor: MaterialStateProperty.all(AppTheme.gray50),
+          headingRowColor: WidgetStateProperty.all(AppTheme.gray50),
           columns: [
             DataColumn(
               label: Text(

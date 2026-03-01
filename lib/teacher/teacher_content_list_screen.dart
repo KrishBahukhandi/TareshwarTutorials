@@ -269,7 +269,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
         return ListView.separated(
           padding: EdgeInsets.all(padding),
           itemCount: filtered.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          separatorBuilder: (_, _) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
             return _buildVideoCard(filtered[index], isMobile);
           },
@@ -317,7 +317,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
         return ListView.separated(
           padding: EdgeInsets.all(padding),
           itemCount: filtered.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          separatorBuilder: (_, _) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
             return _buildNoteCard(filtered[index], isMobile);
           },
@@ -389,7 +389,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
               );
             },
             loading: () => const LinearProgressIndicator(),
-            error: (_, __) => const SizedBox(),
+            error: (_, _) => const SizedBox(),
           ),
           const SizedBox(height: 24),
 
@@ -437,7 +437,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
               );
             },
             loading: () => const LinearProgressIndicator(),
-            error: (_, __) => const SizedBox(),
+            error: (_, _) => const SizedBox(),
           ),
         ],
       ),
@@ -510,9 +510,11 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                     ],
                   ),
                   onTap: () {
+                    final ctx = context;
                     Future.delayed(Duration.zero, () {
+                      if (!ctx.mounted) return;
                       _confirmDelete(
-                        context,
+                        ctx,
                         'video',
                         video.title?.toString() ?? 'this video',
                         () async {
@@ -600,9 +602,11 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
                     ],
                   ),
                   onTap: () {
+                    final ctx = context;
                     Future.delayed(Duration.zero, () {
+                      if (!ctx.mounted) return;
                       _confirmDelete(
-                        context,
+                        ctx,
                         'note',
                         note.title?.toString() ?? 'this note',
                         () async {

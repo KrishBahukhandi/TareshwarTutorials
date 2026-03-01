@@ -127,7 +127,7 @@ class _EnrollmentManagementScreenState
                 }
 
                 return DropdownButtonFormField<String>(
-                  value: _selectedBatchId,
+                  initialValue: _selectedBatchId,
                   decoration: const InputDecoration(
                     hintText: 'Choose a batch to manage enrollments',
                     prefixIcon: Icon(Icons.search, size: 20),
@@ -349,7 +349,7 @@ class _EnrollmentManagementScreenState
                   ),
                   child: ListView.separated(
                     itemCount: _enrollments.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    separatorBuilder: (_, _) => const Divider(height: 1),
                     itemBuilder: (context, index) {
                       final enrollment = _enrollments[index];
                       return _buildEnrollmentTile(enrollment);

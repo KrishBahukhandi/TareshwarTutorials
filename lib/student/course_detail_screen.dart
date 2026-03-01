@@ -293,7 +293,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
     return ListView.separated(
       padding: EdgeInsets.symmetric(vertical: isMobile ? 16 : 24),
       itemCount: items.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 16),
+      separatorBuilder: (_, _) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         return _buildBatchCard(context, items[index], profile, isMobile);
       },

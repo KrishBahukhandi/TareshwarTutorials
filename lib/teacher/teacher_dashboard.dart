@@ -208,7 +208,7 @@ class TeacherDashboard extends ConsumerWidget {
               icon: icon,
               color: color,
             ),
-            error: (_, __) => _StatCard(
+            error: (_, _) => _StatCard(
               title: title,
               value: '0',
               icon: icon,

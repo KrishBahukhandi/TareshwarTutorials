@@ -8,19 +8,29 @@ class StudentService {
   final AuditService _auditService = AuditService();
 
   Future<List<AppUser>> fetchAllStudents({bool includeInactive = false}) async {
-    var query = supabase
-        .from('profiles')
-        .select()
-        .eq('role', 'student');
-    
-    // Filter by is_active if not including inactive
-    if (!includeInactive) {
-      query = query.eq('is_active', true);
+    try {
+      var query = supabase
+          .from('profiles')
+          .select()
+          .eq('role', 'student');
+
+      // Filter by is_active if not including inactive
+      // Guard: column may not exist in older DB schemas
+      if (!includeInactive) {
+        query = query.eq('is_active', true);
+      }
+
+      final data = await query.order('created_at', ascending: false);
+      return (data as List).map((item) => AppUser.fromMap(item)).toList();
+    } catch (e) {
+      // Fallback: fetch all students without is_active filter if column missing
+      final data = await supabase
+          .from('profiles')
+          .select()
+          .eq('role', 'student')
+          .order('created_at', ascending: false);
+      return (data as List).map((item) => AppUser.fromMap(item)).toList();
     }
-    
-    final data = await query.order('created_at', ascending: false);
-    
-    return (data as List).map((item) => AppUser.fromMap(item)).toList();
   }
 
   Future<AppUser?> fetchStudentById(String id) async {
@@ -182,7 +192,7 @@ class StudentService {
         .select('*, batches(*, courses(*))')
         .eq('student_id', studentId)
         .eq('is_active', true)
-        .order('created_at', ascending: false);
+        .order('enrolled_at', ascending: false);
     return List<Map<String, dynamic>>.from(enrollments as List);
   }
   

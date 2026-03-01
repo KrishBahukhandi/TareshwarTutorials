@@ -57,7 +57,7 @@ class StudentDashboard extends ConsumerWidget {
                 totalNotes: data['totalNotes'] ?? 0,
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const SizedBox(),
+              error: (_, _) => const SizedBox(),
             ),
             SizedBox(height: isMobile ? 24 : 48),
 
@@ -111,7 +111,7 @@ class StudentDashboard extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const SizedBox(),
+              error: (_, _) => const SizedBox(),
             ),
           ],
         ),
@@ -333,7 +333,10 @@ class StudentDashboard extends ConsumerWidget {
       ),
       child: InkWell(
         onTap: () {
-          // TODO: Navigate to course content for this enrollment
+          final batchId = enrollment['batch_id'] as String?;
+          if (batchId != null) {
+            context.go('/student/batch/$batchId');
+          }
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -148,14 +147,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
 
-              if (kDebugMode) ...[
+              // Demo quick-login buttons — always visible for easy demo access
+              ...[
                 const SizedBox(height: 20),
                 Row(
                   children: [
                     Expanded(child: Divider(color: AppTheme.gray300)),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text('Debug', style: TextStyle(color: AppTheme.gray500, fontSize: 13)),
+                      child: Text('Demo Accounts', style: TextStyle(color: AppTheme.gray500, fontSize: 13)),
                     ),
                     Expanded(child: Divider(color: AppTheme.gray300)),
                   ],

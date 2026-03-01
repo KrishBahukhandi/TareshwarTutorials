@@ -156,7 +156,7 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                           }
 
                           return DropdownButtonFormField<String>(
-                            value: _batchId,
+                            initialValue: _batchId,
                             decoration: InputDecoration(
                               labelText: 'Select Batch *',
                               prefixIcon: Icon(Icons.class_, color: AppTheme.gray400),
