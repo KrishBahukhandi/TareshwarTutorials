@@ -346,9 +346,59 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
             tooltip: course.isPublished ? 'Unpublish' : 'Publish',
             onPressed: () => _togglePublished(course),
           ),
+          // Delete button
+          IconButton(
+            icon: Icon(Icons.delete_outline, size: 20, color: AppTheme.error),
+            tooltip: 'Delete course',
+            onPressed: () => _confirmDelete(course),
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _confirmDelete(Course course) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Course'),
+        content: Text(
+          'Delete "${course.title}"? This cannot be undone and will also remove all associated batches.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      try {
+        await CourseService().deleteCourse(course.id);
+        _loadCourses();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Course deleted'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          );
+        }
+      }
+    }
   }
 
   Future<void> _togglePublished(Course course) async {
