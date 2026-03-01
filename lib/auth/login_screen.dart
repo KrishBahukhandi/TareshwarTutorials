@@ -45,7 +45,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.10),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -108,7 +108,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   decoration: BoxDecoration(
                     color: AppTheme.errorLight,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppTheme.error.withOpacity(0.3)),
+                    border: Border.all(color: AppTheme.error.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
@@ -252,7 +252,7 @@ class _QuickLoginButton extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Icon(icon, size: 18, color: color),

@@ -160,7 +160,7 @@ class _VideoListScreenState extends ConsumerState<VideoListScreen> {
             Container(
               height: 140,
               decoration: BoxDecoration(
-                color: AppTheme.success.withOpacity(0.1),
+                color: AppTheme.success.withValues(alpha: 0.1),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               ),
               child: Stack(

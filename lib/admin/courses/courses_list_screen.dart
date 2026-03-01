@@ -262,7 +262,7 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
         width: 50,
         height: 50,
         decoration: BoxDecoration(
-          color: AppTheme.primaryBlue.withOpacity(0.1),
+          color: AppTheme.primaryBlue.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(Icons.book, color: AppTheme.primaryBlue),
@@ -280,8 +280,8 @@ class _CoursesListScreenState extends ConsumerState<CoursesListScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: course.isPublished
-                  ? AppTheme.success.withOpacity(0.1)
-                  : AppTheme.warning.withOpacity(0.1),
+                  ? AppTheme.success.withValues(alpha: 0.1)
+                  : AppTheme.warning.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Row(

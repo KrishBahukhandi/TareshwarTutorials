@@ -48,21 +48,65 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'My Content',
-                  style: TextStyle(
-                    fontSize: isMobile ? 24 : 32,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.gray900,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Manage your uploaded videos and notes',
-                  style: TextStyle(
-                    fontSize: isMobile ? 14 : 15,
-                    color: AppTheme.gray600,
-                  ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'My Content',
+                            style: TextStyle(
+                              fontSize: isMobile ? 24 : 32,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.gray900,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Manage your uploaded videos and notes',
+                            style: TextStyle(
+                              fontSize: isMobile ? 14 : 15,
+                              color: AppTheme.gray600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Refresh + Upload buttons
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      tooltip: 'Refresh',
+                      onPressed: () {
+                        ref.invalidate(videoListProvider);
+                        ref.invalidate(notesListProvider);
+                      },
+                    ),
+                    if (!isMobile) ...[
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        onPressed: () => context.go('/teacher/videos/upload'),
+                        icon: const Icon(Icons.videocam, size: 18),
+                        label: const Text('Upload Video'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.success,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton.icon(
+                        onPressed: () => context.go('/teacher/notes/upload'),
+                        icon: const Icon(Icons.upload_file, size: 18),
+                        label: const Text('Upload Notes'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryBlue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 20),
 
@@ -416,7 +460,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
               width: isMobile ? 80 : 100,
               height: isMobile ? 60 : 75,
               decoration: BoxDecoration(
-                color: AppTheme.success.withOpacity(0.1),
+                color: AppTheme.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -506,7 +550,7 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
               width: isMobile ? 60 : 70,
               height: isMobile ? 60 : 70,
               decoration: BoxDecoration(
-                color: AppTheme.primaryBlue.withOpacity(0.1),
+                color: AppTheme.primaryBlue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -650,25 +694,42 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
   void _confirmDelete(BuildContext context, String type, String title, Future<void> Function() onConfirm) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text('Delete $type?'),
         content: Text('Are you sure you want to delete "$title"? This action cannot be undone.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.of(context).pop();
-              await onConfirm();
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('$type deleted successfully'),
-                    backgroundColor: AppTheme.success,
-                  ),
-                );
+              Navigator.of(dialogContext).pop();
+              try {
+                await onConfirm();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.check_circle, color: Colors.white, size: 18),
+                          const SizedBox(width: 10),
+                          Text('${_capitalize(type)} deleted successfully'),
+                        ],
+                      ),
+                      backgroundColor: AppTheme.success,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to delete $type: $e'),
+                      backgroundColor: AppTheme.error,
+                    ),
+                  );
+                }
               }
             },
             style: TextButton.styleFrom(foregroundColor: AppTheme.error),
@@ -678,4 +739,6 @@ class _TeacherContentListScreenState extends ConsumerState<TeacherContentListScr
       ),
     );
   }
+
+  String _capitalize(String s) => s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
 }

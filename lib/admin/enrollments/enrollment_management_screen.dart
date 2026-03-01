@@ -227,7 +227,7 @@ class _EnrollmentManagementScreenState
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: color, size: 20),
@@ -368,7 +368,7 @@ class _EnrollmentManagementScreenState
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       leading: CircleAvatar(
-        backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
+        backgroundColor: AppTheme.primaryBlue.withValues(alpha: 0.1),
         child: Text(
           student.name.isNotEmpty ? student.name[0].toUpperCase() : 'S',
           style: TextStyle(

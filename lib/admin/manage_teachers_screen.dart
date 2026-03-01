@@ -261,7 +261,7 @@ class _ManageTeachersScreenState extends ConsumerState<ManageTeachersScreen> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       leading: CircleAvatar(
         backgroundColor: teacher.isActive
-            ? AppTheme.primaryBlue.withOpacity(0.1)
+            ? AppTheme.primaryBlue.withValues(alpha: 0.1)
             : AppTheme.gray300,
         child: Icon(
           Icons.person,
@@ -279,7 +279,7 @@ class _ManageTeachersScreenState extends ConsumerState<ManageTeachersScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: AppTheme.error.withOpacity(0.1),
+                color: AppTheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(

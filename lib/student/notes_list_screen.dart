@@ -148,7 +148,7 @@ class _NotesListScreenState extends ConsumerState<NotesListScreen> {
               width: isMobile ? 50 : 60,
               height: isMobile ? 50 : 60,
               decoration: BoxDecoration(
-                color: AppTheme.warning.withOpacity(0.1),
+                color: AppTheme.warning.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(

@@ -172,8 +172,8 @@ class _TeacherCoursesScreenState extends ConsumerState<TeacherCoursesScreen> {
           _filterStatus = value;
         });
       },
-      backgroundColor: isSelected ? AppTheme.success.withOpacity(0.1) : AppTheme.gray100,
-      selectedColor: AppTheme.success.withOpacity(0.15),
+      backgroundColor: isSelected ? AppTheme.success.withValues(alpha: 0.1) : AppTheme.gray100,
+      selectedColor: AppTheme.success.withValues(alpha: 0.15),
       checkmarkColor: AppTheme.success,
       labelStyle: TextStyle(
         color: isSelected ? AppTheme.success : AppTheme.gray700,
@@ -216,7 +216,7 @@ class _TeacherCoursesScreenState extends ConsumerState<TeacherCoursesScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(

@@ -112,7 +112,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
                     });
                   },
                   backgroundColor: AppTheme.gray100,
-                  selectedColor: AppTheme.success.withOpacity(0.15),
+                  selectedColor: AppTheme.success.withValues(alpha: 0.15),
                   checkmarkColor: AppTheme.success,
                   labelStyle: TextStyle(
                     color: _showActiveOnly ? AppTheme.success : AppTheme.gray700,
@@ -242,7 +242,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: AppTheme.success.withOpacity(0.1),
+                  backgroundColor: AppTheme.success.withValues(alpha: 0.1),
                   child: Text(
                     name[0].toUpperCase(),
                     style: TextStyle(
@@ -279,7 +279,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: isActive
-                        ? AppTheme.success.withOpacity(0.1)
+                        ? AppTheme.success.withValues(alpha: 0.1)
                         : AppTheme.gray200,
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -372,7 +372,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
                     children: [
                       CircleAvatar(
                         radius: 16,
-                        backgroundColor: AppTheme.success.withOpacity(0.1),
+                        backgroundColor: AppTheme.success.withValues(alpha: 0.1),
                         child: Text(
                           name[0].toUpperCase(),
                           style: TextStyle(
@@ -396,7 +396,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: isActive
-                          ? AppTheme.success.withOpacity(0.1)
+                          ? AppTheme.success.withValues(alpha: 0.1)
                           : AppTheme.gray200,
                       borderRadius: BorderRadius.circular(4),
                     ),

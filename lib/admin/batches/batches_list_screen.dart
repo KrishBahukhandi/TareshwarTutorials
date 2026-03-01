@@ -298,7 +298,7 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
         width: 50,
         height: 50,
         decoration: BoxDecoration(
-          color: statusColor.withOpacity(0.1),
+          color: statusColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(Icons.groups, color: statusColor),
@@ -316,7 +316,7 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Row(

@@ -132,7 +132,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                AppTheme.primaryBlue.withOpacity(0.8),
+                AppTheme.primaryBlue.withValues(alpha: 0.8),
                 AppTheme.primaryBlue,
               ],
             ),
@@ -216,7 +216,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppTheme.primaryBlue.withOpacity(0.1),
+            color: AppTheme.primaryBlue.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: AppTheme.primaryBlue, size: 24),
@@ -342,7 +342,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(

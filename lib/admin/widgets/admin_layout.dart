@@ -116,7 +116,7 @@ class _SidebarContent extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: cs.primary.withOpacity(0.12),
+                    color: cs.primary.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
@@ -285,7 +285,7 @@ class _NavItem extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: isActive ? activeColor.withOpacity(0.12) : Colors.transparent,
+            color: isActive ? activeColor.withValues(alpha: 0.12) : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
           ),
           child: Row(

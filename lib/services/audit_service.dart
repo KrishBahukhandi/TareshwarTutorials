@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
+
 import 'supabase_client.dart';
 
 /// Service for logging admin actions for compliance and debugging
@@ -38,7 +40,8 @@ class AuditService {
       });
     } catch (e) {
       // Log failure silently - don't block the main operation
-      print('Audit logging failed: $e');
+      // ignore: avoid_print
+      debugPrint('Audit logging failed: $e');
     }
   }
 
