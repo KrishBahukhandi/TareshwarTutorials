@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../core/utils/app_user.dart';
 import 'supabase_client.dart';
 
@@ -7,7 +9,11 @@ class ProfileService {
         .from('profiles')
         .select()
         .eq('id', userId)
-        .maybeSingle();
+        .maybeSingle()
+        .timeout(
+          const Duration(seconds: 15),
+          onTimeout: () => throw TimeoutException('Could not reach the server. Please check your connection.'),
+        );
     if (data == null) return null;
     return AppUser.fromMap(data);
   }

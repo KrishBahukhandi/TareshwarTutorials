@@ -142,6 +142,9 @@ class AuthController extends StateNotifier<AuthState> {
       final response = await _authService.signInWithEmail(
         email: email,
         password: password,
+      ).timeout(
+        const Duration(seconds: 20),
+        onTimeout: () => throw TimeoutException('Sign in timed out. Please check your connection.'),
       );
 
       final user = response.user;
@@ -155,11 +158,17 @@ class AuthController extends StateNotifier<AuthState> {
       }
 
       await _loadProfile(user.id);
-    } on sb.AuthException catch (e) {
+    }    on sb.AuthException catch (e) {
       state = state.copyWith(
         status: AuthStatus.unauthenticated,
         isLoading: false,
         error: e.message,
+      );
+    } on TimeoutException catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.unauthenticated,
+        isLoading: false,
+        error: e.message ?? 'Request timed out. Please try again.',
       );
     } catch (_) {
       state = state.copyWith(
@@ -215,7 +224,10 @@ class AuthController extends StateNotifier<AuthState> {
   Future<void> _loadProfile(String userId) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final profile = await _profileService.fetchProfile(userId);
+      final profile = await _profileService.fetchProfile(userId).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () => throw TimeoutException('Profile load timed out. Please check your connection.'),
+      );
       if (profile == null) {
         state = state.copyWith(
           status: AuthStatus.unauthenticated,
@@ -229,6 +241,12 @@ class AuthController extends StateNotifier<AuthState> {
         profile: profile,
         isLoading: false,
         error: null,
+      );
+    } on TimeoutException catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.unauthenticated,
+        isLoading: false,
+        error: e.message ?? 'Request timed out. Please try again.',
       );
     } catch (_) {
       state = state.copyWith(

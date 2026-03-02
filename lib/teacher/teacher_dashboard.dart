@@ -24,6 +24,26 @@ final teacherStudentsCountProvider = FutureProvider<int>((ref) async {
   return await TeacherService().fetchTeacherStudentCount(teacherId);
 });
 
+final teacherVideosCountProvider = FutureProvider<int>((ref) async {
+  final teacherId = supabase.auth.currentUser?.id;
+  if (teacherId == null) return 0;
+  final rows = await supabase
+      .from('recorded_videos')
+      .select('id')
+      .eq('uploaded_by', teacherId);
+  return (rows as List).length;
+});
+
+final teacherNotesCountProvider = FutureProvider<int>((ref) async {
+  final teacherId = supabase.auth.currentUser?.id;
+  if (teacherId == null) return 0;
+  final rows = await supabase
+      .from('notes')
+      .select('id')
+      .eq('uploaded_by', teacherId);
+  return (rows as List).length;
+});
+
 class TeacherDashboard extends ConsumerWidget {
   const TeacherDashboard({super.key});
 
@@ -102,7 +122,7 @@ class TeacherDashboard extends ConsumerWidget {
                       child: _buildStatCard(
                         context: context,
                         title: 'Videos',
-                        count: 0, // TODO: Implement content counts
+                        provider: teacherVideosCountProvider,
                         icon: Icons.video_library_rounded,
                         color: AppTheme.warning,
                       ),
@@ -112,7 +132,7 @@ class TeacherDashboard extends ConsumerWidget {
                       child: _buildStatCard(
                         context: context,
                         title: 'Notes',
-                        count: 0, // TODO: Implement content counts
+                        provider: teacherNotesCountProvider,
                         icon: Icons.note_rounded,
                         color: AppTheme.info,
                       ),

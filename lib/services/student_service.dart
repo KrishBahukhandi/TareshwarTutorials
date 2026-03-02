@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/utils/app_user.dart';
@@ -192,7 +194,8 @@ class StudentService {
         .select('*, batches(*, courses(*))')
         .eq('student_id', studentId)
         .eq('is_active', true)
-        .order('enrolled_at', ascending: false);
+        .order('enrolled_at', ascending: false)
+        .timeout(const Duration(seconds: 15));
     return List<Map<String, dynamic>>.from(enrollments as List);
   }
   
@@ -201,7 +204,8 @@ class StudentService {
         .from('enrollments')
         .select('batch_id')
         .eq('student_id', studentId)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .timeout(const Duration(seconds: 15));
     final enrolledCount = (enrollments as List).length;
     return {
       'enrolledCourses': enrolledCount,
@@ -215,7 +219,8 @@ class StudentService {
         .from('enrollments')
         .select('batch_id')
         .eq('student_id', studentId)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .timeout(const Duration(seconds: 15));
     
     if ((enrollments as List).isEmpty) return [];
     
@@ -225,7 +230,8 @@ class StudentService {
         .from('recorded_videos')
         .select('*, batches(*, courses(*))')
         .inFilter('batch_id', batchIds)
-        .order('created_at', ascending: false);
+        .order('created_at', ascending: false)
+        .timeout(const Duration(seconds: 15));
     
     return List<Map<String, dynamic>>.from(videos as List);
   }
@@ -235,7 +241,8 @@ class StudentService {
         .from('enrollments')
         .select('batch_id')
         .eq('student_id', studentId)
-        .eq('is_active', true);
+        .eq('is_active', true)
+        .timeout(const Duration(seconds: 15));
     
     if ((enrollments as List).isEmpty) return [];
     
@@ -245,7 +252,8 @@ class StudentService {
         .from('notes')
         .select('*, batches(*, courses(*))')
         .inFilter('batch_id', batchIds)
-        .order('created_at', ascending: false);
+        .order('created_at', ascending: false)
+        .timeout(const Duration(seconds: 15));
     
     return List<Map<String, dynamic>>.from(notes as List);
   }

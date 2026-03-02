@@ -167,9 +167,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   password: 'ChangeMe123!',
                   icon: Icons.admin_panel_settings_outlined,
                   color: AppTheme.primaryBlue,
-                  onTap: () {
+                  isLoading: authState.isLoading,
+                  onTap: () async {
+                    FocusScope.of(context).unfocus();
                     _emailController.text = 'admin@edutech.test';
                     _passwordController.text = 'ChangeMe123!';
+                    await ref.read(authControllerProvider.notifier).signIn(
+                      email: 'admin@edutech.test',
+                      password: 'ChangeMe123!',
+                    );
                   },
                 ),
                 const SizedBox(height: 8),
@@ -179,9 +185,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   password: 'ChangeMe123!',
                   icon: Icons.person_outline,
                   color: AppTheme.success,
-                  onTap: () {
+                  isLoading: authState.isLoading,
+                  onTap: () async {
+                    FocusScope.of(context).unfocus();
                     _emailController.text = 'teacher@edutech.test';
                     _passwordController.text = 'ChangeMe123!';
+                    await ref.read(authControllerProvider.notifier).signIn(
+                      email: 'teacher@edutech.test',
+                      password: 'ChangeMe123!',
+                    );
                   },
                 ),
                 const SizedBox(height: 8),
@@ -191,9 +203,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   password: 'ChangeMe123!',
                   icon: Icons.school_outlined,
                   color: const Color(0xFF8B5CF6),
-                  onTap: () {
+                  isLoading: authState.isLoading,
+                  onTap: () async {
+                    FocusScope.of(context).unfocus();
                     _emailController.text = 'student@edutech.test';
                     _passwordController.text = 'ChangeMe123!';
+                    await ref.read(authControllerProvider.notifier).signIn(
+                      email: 'student@edutech.test',
+                      password: 'ChangeMe123!',
+                    );
                   },
                 ),
               ],
@@ -230,6 +248,7 @@ class _QuickLoginButton extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.onTap,
+    this.isLoading = false,
   });
 
   final String label;
@@ -238,11 +257,12 @@ class _QuickLoginButton extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton(
-      onPressed: onTap,
+      onPressed: isLoading ? null : onTap,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.all(12),
         side: BorderSide(color: AppTheme.gray300),
@@ -258,14 +278,24 @@ class _QuickLoginButton extends StatelessWidget {
             child: Icon(icon, size: 18, color: color),
           ),
           const SizedBox(width: 12),
-          Text(
-            'Login as $label',
-            style: TextStyle(
-              color: AppTheme.gray700,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              'Login as $label',
+              style: TextStyle(
+                color: AppTheme.gray700,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
+          if (isLoading)
+            SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2, color: color),
+            )
+          else
+            Icon(Icons.arrow_forward_ios, size: 14, color: AppTheme.gray400),
         ],
       ),
     );
