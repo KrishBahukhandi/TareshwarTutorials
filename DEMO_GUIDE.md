@@ -8,7 +8,7 @@
 | Teacher | teacher@edutech.test     | ChangeMe123!  |
 | Student | student@edutech.test     | ChangeMe123!  |
 
-> **Quick Login:** The login screen has one-click demo buttons for each role.
+> **One-Click Login:** The login screen has instant demo buttons — clicking them fills credentials **and signs in automatically** (no extra button press needed).
 
 ---
 
@@ -37,22 +37,22 @@
 ## Demo Run-of-Show
 
 ### 1. Admin Flow (~5 min)
-1. Login as **Admin** → Dashboard shows stats (courses, students, teachers)
+1. Click **Login as Admin** button → instantly signs in → Dashboard shows live stats
 2. **Courses** → See 3 seeded courses; create a new course; publish it
 3. **Batches** → See batches with course names; create a new batch
-4. **Students** → View student list with search/filter; create a new student
+4. **Students** → View student list; create a new student
 5. **Teachers** → View teacher list; create a new teacher
 6. **Enrollments** → Select a batch → enroll / unenroll a student
 
 ### 2. Teacher Flow (~4 min)
-1. Login as **Teacher (Rajesh Kumar)** → Dashboard shows assigned batches + stats
-2. **My Content** → See uploaded videos / notes (empty initially)
+1. Click **Login as Teacher** → Dashboard shows assigned batches + video/notes counts
+2. **My Content** → See uploaded videos / notes
 3. **Upload Video** → Select a batch → fill title → pick a video file → upload
 4. **Upload Notes** → Select a batch → fill title → pick a PDF → upload
 5. Verify content appears in the content list with batch/course label
 
 ### 3. Student Flow (~4 min)
-1. Login as **Student (Priya Sharma)** → Dashboard shows 2 enrolled courses
+1. Click **Login as Student** → Dashboard shows 2 enrolled courses
 2. **My Courses** → Two course cards visible → click one
 3. **Batch Content** → Videos tab and Notes tab shown
    - Videos: tap any video → opens in browser tab (web) / native player (mobile)
@@ -61,22 +61,30 @@
 
 ---
 
+## Timeout Behaviour
+- All network calls have **15–20 second timeouts**
+- If the backend is slow, a clear error message is shown ("Request timed out. Please try again.") — no infinite spinners
+
 ## Known Limitations (by design for this demo)
 - **Live Class** feature is not implemented (out of scope)
 - Storage bucket must have public policy or signed URLs work (6-hour expiry)
-- Admin Students List "deactivate" requires running `scripts/fix_profiles_columns_and_rls.sql` in Supabase (adds `is_active` column to profiles)
 
 ---
 
-## Required One-Time Setup
+## ⚠️ Required One-Time Setup (CRITICAL – must do before demo)
 
 Run this SQL in the **Supabase SQL Editor** before the demo:
 ```
 https://supabase.com/dashboard/project/cyfwcgsfdlecnkycpjsk/sql/new
 ```
-Copy-paste the contents of: **`scripts/fix_profiles_columns_and_rls.sql`**
+Copy-paste the contents of: **`scripts/fix_all_rls_final.sql`**
 
-This adds `is_active` and `deleted_at` columns to `profiles` and fixes admin RLS.
+This:
+- Creates the `get_my_role()` security-definer function (prevents infinite recursion)
+- Fixes all RLS policies on `profiles`, `enrollments`, `courses`, `batches`, `recorded_videos`, `notes`
+- Adds `is_active` and `deleted_at` columns to `profiles` if missing
+
+**Without this step, login will result in a 500 error.**
 
 ---
 
