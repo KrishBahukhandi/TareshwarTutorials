@@ -65,4 +65,8 @@ class CourseService {
         .update({'is_published': isPublished})
         .eq('id', courseId);
   }
+
+  Future<void> deleteCourse(String courseId) async {
+    await supabase.from('courses').delete().eq('id', courseId);
+  }
 }

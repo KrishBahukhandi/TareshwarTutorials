@@ -142,6 +142,12 @@ class _StudentsListScreenState extends ConsumerState<StudentsListScreen> {
                             ),
                           ),
                           const SizedBox(width: 16),
+                          IconButton(
+                            icon: const Icon(Icons.refresh),
+                            tooltip: 'Refresh',
+                            onPressed: _loadStudents,
+                          ),
+                          const SizedBox(width: 8),
                           FilledButton.icon(
                             onPressed: () => context.go('/admin/students/create'),
                             icon: const Icon(Icons.add, size: 18),
@@ -227,7 +233,7 @@ class _StudentsListScreenState extends ConsumerState<StudentsListScreen> {
                               ),
                               child: ListView.separated(
                                 itemCount: _paginatedStudents.length,
-                                separatorBuilder: (_, __) => const Divider(height: 1),
+                                separatorBuilder: (_, _) => const Divider(height: 1),
                                 itemBuilder: (context, index) {
                                   final student = _paginatedStudents[index];
                                   return _buildStudentTile(student);
@@ -262,7 +268,7 @@ class _StudentsListScreenState extends ConsumerState<StudentsListScreen> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       leading: CircleAvatar(
         backgroundColor: isActive
-            ? AppTheme.primaryBlue.withOpacity(0.1)
+            ? AppTheme.primaryBlue.withValues(alpha: 0.1)
             : AppTheme.gray300,
         child: Text(
           student.name.isNotEmpty ? student.name[0].toUpperCase() : 'S',
@@ -283,7 +289,7 @@ class _StudentsListScreenState extends ConsumerState<StudentsListScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: AppTheme.error.withOpacity(0.1),
+                color: AppTheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(

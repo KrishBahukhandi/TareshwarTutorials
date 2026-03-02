@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/theme/app_theme.dart';
 import '../providers/student_providers.dart';
+import '../auth/auth_controller.dart';
 import 'widgets/student_layout.dart';
 
 class StudentDashboard extends ConsumerWidget {
@@ -16,6 +17,8 @@ class StudentDashboard extends ConsumerWidget {
     final padding = isMobile ? 16.0 : 32.0;
     final stats = ref.watch(studentStatsProvider);
     final enrollments = ref.watch(studentEnrollmentsProvider);
+    final profile = ref.watch(profileProvider);
+    final firstName = profile?.name.split(' ').first ?? 'Student';
 
     return StudentLayout(
       currentRoute: '/student',
@@ -26,7 +29,7 @@ class StudentDashboard extends ConsumerWidget {
           children: [
             // Welcome Header
             Text(
-              'Welcome Back!',
+              'Welcome back, $firstName! 👋',
               style: TextStyle(
                 fontSize: isMobile ? 24 : 32,
                 fontWeight: FontWeight.bold,
@@ -54,7 +57,7 @@ class StudentDashboard extends ConsumerWidget {
                 totalNotes: data['totalNotes'] ?? 0,
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const SizedBox(),
+              error: (_, _) => const SizedBox(),
             ),
             SizedBox(height: isMobile ? 24 : 48),
 
@@ -108,7 +111,7 @@ class StudentDashboard extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => const SizedBox(),
+              error: (_, _) => const SizedBox(),
             ),
           ],
         ),
@@ -176,7 +179,7 @@ class StudentDashboard extends ConsumerWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: color, size: 28),
@@ -276,7 +279,7 @@ class StudentDashboard extends ConsumerWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -330,7 +333,10 @@ class StudentDashboard extends ConsumerWidget {
       ),
       child: InkWell(
         onTap: () {
-          // TODO: Navigate to course content for this enrollment
+          final batchId = enrollment['batch_id'] as String?;
+          if (batchId != null) {
+            context.go('/student/batch/$batchId');
+          }
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
@@ -341,7 +347,7 @@ class StudentDashboard extends ConsumerWidget {
                 width: isMobile ? 50 : 60,
                 height: isMobile ? 50 : 60,
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryBlue.withOpacity(0.1),
+                  color: AppTheme.primaryBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(

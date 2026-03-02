@@ -170,7 +170,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                               children: [
                                 CircleAvatar(
                                   radius: 32,
-                                  backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
+                                  backgroundColor: AppTheme.primaryBlue.withValues(alpha: 0.1),
                                   child: Icon(
                                     Icons.person,
                                     size: 32,
@@ -301,7 +301,7 @@ class _EditStudentScreenState extends ConsumerState<EditStudentScreen> {
                                     onChanged: (value) {
                                       setState(() => _isActive = value);
                                     },
-                                    activeColor: AppTheme.success,
+                                    activeThumbColor: AppTheme.success,
                                   ),
                                 ],
                               ),

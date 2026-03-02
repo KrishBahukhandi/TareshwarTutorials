@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../core/theme/app_theme.dart';
 import '../core/utils/course.dart';
 import '../core/utils/teacher_profile.dart';
 import '../providers/data_providers.dart';
@@ -41,18 +43,30 @@ class _CreateBatchScreenState extends ConsumerState<CreateBatchScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
-              Text(
-                'Create New Batch',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () => context.go('/admin/batches'),
+                  ),
+                  const SizedBox(width: 8),
+                      Text(
+                    'Create New Batch',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ],
               ),
               const SizedBox(height: 8),
-              Text(
-                'Set up a new batch with course, teacher, and schedule',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+              Padding(
+                padding: const EdgeInsets.only(left: 56),
+                child: Text(
+                  'Set up a new batch with course, teacher, and schedule',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.gray600,
+                      ),
+                ),
               ),
               const SizedBox(height: 32),
 
@@ -64,7 +78,7 @@ class _CreateBatchScreenState extends ConsumerState<CreateBatchScreen> {
                     children: [
               courses.when(
                 data: (items) => DropdownButtonFormField<Course>(
-                  value: _selectedCourse,
+                  initialValue: _selectedCourse,
                   items: items
                       .map((course) => DropdownMenuItem(
                             value: course,
@@ -86,7 +100,7 @@ class _CreateBatchScreenState extends ConsumerState<CreateBatchScreen> {
                     return const Text('No active teachers available.');
                   }
                   return DropdownButtonFormField<TeacherProfile>(
-                    value: _selectedTeacher,
+                    initialValue: _selectedTeacher,
                     items: activeTeachers
                         .map((teacher) => DropdownMenuItem(
                               value: teacher,
@@ -188,17 +202,15 @@ class _CreateBatchScreenState extends ConsumerState<CreateBatchScreen> {
                           seatLimit: seatLimit,
                         );
 
-                    setState(() {
-                      _selectedCourse = null;
-                      _selectedTeacher = null;
-                      _startDate = null;
-                      _endDate = null;
-                      _seatLimitController.text = '30';
-                    });
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Batch created.')),
-                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Batch created successfully!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      context.go('/admin/batches');
+                    }
                   },
                   child: const Text('Create Batch'),
                 ),

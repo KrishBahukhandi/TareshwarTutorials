@@ -31,7 +31,8 @@ class TeacherDashboard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isMobile = MediaQuery.of(context).size.width < 800;
     final padding = isMobile ? 16.0 : 32.0;
-    final user = ref.watch(authControllerProvider);
+    final profile = ref.watch(profileProvider);
+    final firstName = profile?.name.split(' ').first ?? 'Teacher';
 
     return TeacherLayout(
       currentRoute: '/teacher',
@@ -42,7 +43,7 @@ class TeacherDashboard extends ConsumerWidget {
           children: [
             // Welcome Header
             Text(
-              'Welcome back!',
+              'Welcome back, $firstName! 👋',
               style: TextStyle(
                 fontSize: isMobile ? 24 : 32,
                 fontWeight: FontWeight.bold,
@@ -207,7 +208,7 @@ class TeacherDashboard extends ConsumerWidget {
               icon: icon,
               color: color,
             ),
-            error: (_, __) => _StatCard(
+            error: (_, _) => _StatCard(
               title: title,
               value: '0',
               icon: icon,
@@ -250,7 +251,7 @@ class TeacherDashboard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -319,7 +320,7 @@ class _StatCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: color, size: 22),

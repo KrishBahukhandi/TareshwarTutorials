@@ -241,7 +241,7 @@ class _EditTeacherScreenState extends State<EditTeacherScreen> {
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
                                     color: _isActive
-                                        ? AppTheme.success.withOpacity(0.1)
+                                        ? AppTheme.success.withValues(alpha: 0.1)
                                         : AppTheme.gray300,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
@@ -282,7 +282,7 @@ class _EditTeacherScreenState extends State<EditTeacherScreen> {
                                   onChanged: (value) {
                                     setState(() => _isActive = value);
                                   },
-                                  activeColor: AppTheme.success,
+                                  activeThumbColor: AppTheme.success,
                                 ),
                               ],
                             ),

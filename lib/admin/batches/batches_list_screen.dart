@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../../core/utils/batch.dart';
+import '../../core/utils/batch_with_course.dart';
 import '../../services/batch_service.dart';
 import '../widgets/admin_layout.dart';
 import '../widgets/search_filter_widgets.dart';
@@ -16,8 +16,8 @@ class BatchesListScreen extends ConsumerStatefulWidget {
 }
 
 class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
-  List<Batch> _allBatches = [];
-  List<Batch> _filteredBatches = [];
+  List<BatchWithCourse> _allBatches = [];
+  List<BatchWithCourse> _filteredBatches = [];
   bool _isLoading = true;
   String _searchQuery = '';
   String _selectedFilter = 'all';
@@ -33,7 +33,7 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
   Future<void> _loadBatches() async {
     setState(() => _isLoading = true);
     try {
-      final batches = await BatchService().fetchAllBatches();
+      final batches = await BatchService().fetchAllBatchesWithCourse();
       setState(() {
         _allBatches = batches;
         _applyFilters();
@@ -52,38 +52,37 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
     }
   }
 
-  bool _isBatchActive(Batch batch) {
+  bool _isBatchActive(BatchWithCourse bwc) {
     final now = DateTime.now();
-    return batch.startDate.isBefore(now) && batch.endDate.isAfter(now);
+    return bwc.batch.startDate.isBefore(now) && bwc.batch.endDate.isAfter(now);
   }
 
   void _applyFilters() {
     var filtered = _allBatches;
 
-    // Apply search filter (by batch ID substring)
     if (_searchQuery.isNotEmpty) {
-      filtered = filtered.where((batch) {
+      filtered = filtered.where((bwc) {
         final query = _searchQuery.toLowerCase();
-        return batch.id.toLowerCase().contains(query);
+        return bwc.course.title.toLowerCase().contains(query) ||
+            bwc.batch.id.toLowerCase().contains(query);
       }).toList();
     }
 
-    // Apply status filter
     if (_selectedFilter == 'active') {
       filtered = filtered.where((b) => _isBatchActive(b)).toList();
     } else if (_selectedFilter == 'upcoming') {
-      filtered = filtered.where((b) => b.startDate.isAfter(DateTime.now())).toList();
+      filtered = filtered.where((b) => b.batch.startDate.isAfter(DateTime.now())).toList();
     } else if (_selectedFilter == 'past') {
-      filtered = filtered.where((b) => b.endDate.isBefore(DateTime.now())).toList();
+      filtered = filtered.where((b) => b.batch.endDate.isBefore(DateTime.now())).toList();
     }
 
     setState(() {
       _filteredBatches = filtered;
-      _currentPage = 1; // Reset to first page
+      _currentPage = 1;
     });
   }
 
-  List<Batch> get _paginatedBatches {
+  List<BatchWithCourse> get _paginatedBatches {
     final start = (_currentPage - 1) * _itemsPerPage;
     final end = start + _itemsPerPage;
     if (start >= _filteredBatches.length) return [];
@@ -167,7 +166,7 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
 
                 // Search and Filters
                 AdminSearchFilters(
-                  searchHint: 'Search by batch ID...',
+                  searchHint: 'Search by course name...',
                   onSearch: (query) {
                     setState(() => _searchQuery = query);
                     _applyFilters();
@@ -239,10 +238,10 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
                               ),
                               child: ListView.separated(
                                 itemCount: _paginatedBatches.length,
-                                separatorBuilder: (_, __) => const Divider(height: 1),
+                                separatorBuilder: (_, _) => const Divider(height: 1),
                                 itemBuilder: (context, index) {
-                                  final batch = _paginatedBatches[index];
-                                  return _buildBatchTile(batch);
+                                  final bwc = _paginatedBatches[index];
+                                  return _buildBatchTile(bwc);
                                 },
                               ),
                             ),
@@ -267,16 +266,18 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
     );
   }
 
-  Widget _buildBatchTile(Batch batch) {
-    final isActive = _isBatchActive(batch);
+  Widget _buildBatchTile(BatchWithCourse bwc) {
+    final batch = bwc.batch;
+    final course = bwc.course;
+    final isActive = _isBatchActive(bwc);
     final isUpcoming = batch.startDate.isAfter(DateTime.now());
     final startDate = '${batch.startDate.day}/${batch.startDate.month}/${batch.startDate.year}';
     final endDate = '${batch.endDate.day}/${batch.endDate.month}/${batch.endDate.year}';
-    
+
     Color statusColor;
     String statusText;
     IconData statusIcon;
-    
+
     if (isActive) {
       statusColor = AppTheme.success;
       statusText = 'Active';
@@ -297,7 +298,7 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
         width: 50,
         height: 50,
         decoration: BoxDecoration(
-          color: statusColor.withOpacity(0.1),
+          color: statusColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(Icons.groups, color: statusColor),
@@ -306,15 +307,16 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
         children: [
           Expanded(
             child: Text(
-              'Batch ${batch.id.substring(0, 8).toUpperCase()}',
+              course.title,
               style: const TextStyle(fontWeight: FontWeight.w600),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(0.1),
+              color: statusColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Row(
@@ -362,17 +364,11 @@ class _BatchesListScreenState extends ConsumerState<BatchesListScreen> {
           ),
         ],
       ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Edit button
-          IconButton(
-            icon: const Icon(Icons.edit, size: 20),
-            onPressed: () => context.go('/admin/batches/${batch.id}/edit'),
-            tooltip: 'Edit batch',
-            color: AppTheme.gray700,
-          ),
-        ],
+      trailing: IconButton(
+        icon: const Icon(Icons.edit, size: 20),
+        onPressed: () => context.go('/admin/batches/${batch.id}/edit'),
+        tooltip: 'Edit batch',
+        color: AppTheme.gray700,
       ),
     );
   }

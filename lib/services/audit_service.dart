@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'package:flutter/foundation.dart';
 
 import 'supabase_client.dart';
 
@@ -39,7 +40,8 @@ class AuditService {
       });
     } catch (e) {
       // Log failure silently - don't block the main operation
-      print('Audit logging failed: $e');
+      // ignore: avoid_print
+      debugPrint('Audit logging failed: $e');
     }
   }
 

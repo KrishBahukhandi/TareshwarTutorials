@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/theme/app_theme.dart';
 import '../services/notes_service.dart';
@@ -23,6 +24,16 @@ final batchVideosProvider = FutureProvider.family<List<Map<String, dynamic>>, St
 
   final videos = await StudentService().fetchStudentVideos(user.id);
   return videos.where((v) => v['batch_id'] == batchId).toList();
+});
+
+// Provider for batch info (course name + start date)
+final batchInfoProvider = FutureProvider.family<Map<String, dynamic>?, String>((ref, batchId) async {
+  final data = await supabase
+      .from('batches')
+      .select('*, courses(*)')
+      .eq('id', batchId)
+      .maybeSingle();
+  return data;
 });
 
 class BatchContentScreen extends ConsumerStatefulWidget {
@@ -50,6 +61,25 @@ class _BatchContentScreenState extends ConsumerState<BatchContentScreen>
     super.dispose();
   }
 
+  Widget _statChip(IconData icon, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 5),
+          Text(label, style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 800;
@@ -57,6 +87,16 @@ class _BatchContentScreenState extends ConsumerState<BatchContentScreen>
 
     final notes = ref.watch(batchNotesProvider(widget.batchId));
     final videos = ref.watch(batchVideosProvider(widget.batchId));
+    final batchInfo = ref.watch(batchInfoProvider(widget.batchId));
+
+    // Derive course name and batch date from batchInfo
+    final courseTitle = batchInfo.valueOrNull?['courses']?['title']?.toString();
+    final startDateStr = batchInfo.valueOrNull?['start_date'] as String?;
+    String? batchDate;
+    if (startDateStr != null) {
+      final d = DateTime.tryParse(startDateStr);
+      if (d != null) batchDate = '${d.day}/${d.month}/${d.year}';
+    }
 
     return StudentLayout(
       currentRoute: '/student/batch/${widget.batchId}',
@@ -73,23 +113,44 @@ class _BatchContentScreenState extends ConsumerState<BatchContentScreen>
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    'Course Content',
-                    style: TextStyle(
-                      fontSize: isMobile ? 22 : 28,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.gray900,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        courseTitle ?? 'Course Content',
+                        style: TextStyle(
+                          fontSize: isMobile ? 22 : 28,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.gray900,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (batchDate != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          'Batch started: $batchDate',
+                          style: TextStyle(fontSize: 13, color: AppTheme.gray600),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 6),
-            Text(
-              'Videos and notes for this batch',
-              style: TextStyle(color: AppTheme.gray600),
-            ),
-            const SizedBox(height: 20),
+            // Stats row
+            videos.whenOrNull(data: (v) => notes.whenOrNull(data: (n) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(
+                children: [
+                  _statChip(Icons.video_library, '${v.length} video${v.length == 1 ? '' : 's'}', AppTheme.success),
+                  const SizedBox(width: 8),
+                  _statChip(Icons.description, '${n.length} note${n.length == 1 ? '' : 's'}', AppTheme.warning),
+                ],
+              ),
+            ))) ?? const SizedBox(),
+            const SizedBox(height: 16),
 
             Container(
               decoration: BoxDecoration(
@@ -145,7 +206,7 @@ class _VideosTab extends StatelessWidget {
 
         return ListView.separated(
           itemCount: items.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          separatorBuilder: (_, _) => const SizedBox(height: 12),
           itemBuilder: (context, i) {
             final v = items[i];
             final title = v['title']?.toString() ?? 'Untitled';
@@ -158,17 +219,22 @@ class _VideosTab extends StatelessWidget {
                 side: BorderSide(color: AppTheme.gray200),
               ),
               child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 leading: Container(
-                  width: 42,
-                  height: 42,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
-                    color: AppTheme.success.withOpacity(0.1),
+                    color: AppTheme.success.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(Icons.play_arrow, color: AppTheme.success),
+                  child: Icon(Icons.play_circle_filled, color: AppTheme.success, size: 28),
                 ),
-                title: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis),
-                subtitle: const Text('Tap to watch'),
+                title: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w500)),
+                subtitle: Text(
+                  _formatVideoDuration(v['duration_seconds']),
+                  style: TextStyle(color: AppTheme.gray500, fontSize: 12),
+                ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => context.go('/student/videos/$videoId'),
               ),
@@ -181,6 +247,15 @@ class _VideosTab extends StatelessWidget {
         child: Text('Failed to load videos: $e', style: TextStyle(color: AppTheme.error)),
       ),
     );
+  }
+
+  String _formatVideoDuration(dynamic seconds) {
+    final s = (seconds as num?)?.toInt() ?? 0;
+    final m = s ~/ 60;
+    final h = m ~/ 60;
+    if (h > 0) return '${h}h ${m % 60}m';
+    if (m > 0) return '${m}m ${(s % 60).toString().padLeft(2, '0')}s';
+    return '${s}s';
   }
 }
 
@@ -207,7 +282,7 @@ class _NotesTab extends StatelessWidget {
 
         return ListView.separated(
           itemCount: items.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          separatorBuilder: (_, _) => const SizedBox(height: 12),
           itemBuilder: (context, i) {
             final n = items[i];
             final title = n['title']?.toString() ?? 'Untitled';
@@ -220,27 +295,36 @@ class _NotesTab extends StatelessWidget {
                 side: BorderSide(color: AppTheme.gray200),
               ),
               child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 leading: Container(
-                  width: 42,
-                  height: 42,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
-                    color: AppTheme.warning.withOpacity(0.1),
+                    color: AppTheme.warning.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(Icons.description, color: AppTheme.warning),
+                  child: Icon(Icons.description_rounded, color: AppTheme.warning, size: 26),
                 ),
-                title: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis),
-                subtitle: const Text('Tap to open'),
-                trailing: const Icon(Icons.open_in_new),
+                title: Text(title, maxLines: 2, overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.w500)),
+                subtitle: Text('Tap to open in browser',
+                    style: TextStyle(color: AppTheme.gray500, fontSize: 12)),
+                trailing: Icon(Icons.open_in_new, color: AppTheme.warning),
                 onTap: storagePath == null
                     ? null
                     : () async {
                         try {
                           final signedUrl = await notesService.createSignedUrl(storagePath);
-                          if (context.mounted) {
-                            // Open in browser tab
-                            // ignore: use_build_context_synchronously
-                            context.go(signedUrl);
+                          final uri = Uri.parse(signedUrl);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri, mode: LaunchMode.externalApplication);
+                          } else if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('Unable to open file'),
+                                backgroundColor: AppTheme.error,
+                              ),
+                            );
                           }
                         } catch (e) {
                           if (context.mounted) {

@@ -74,6 +74,11 @@ class AdminCoursesController extends AsyncNotifier<List<Course>> {
     await refresh();
   }
 
+  Future<void> deleteCourse(String courseId) async {
+    await ref.read(courseServiceProvider).deleteCourse(courseId);
+    await refresh();
+  }
+
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = AsyncData(await ref.read(courseServiceProvider).fetchAllCourses());

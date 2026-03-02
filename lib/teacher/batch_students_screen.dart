@@ -112,7 +112,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
                     });
                   },
                   backgroundColor: AppTheme.gray100,
-                  selectedColor: AppTheme.success.withOpacity(0.15),
+                  selectedColor: AppTheme.success.withValues(alpha: 0.15),
                   checkmarkColor: AppTheme.success,
                   labelStyle: TextStyle(
                     color: _showActiveOnly ? AppTheme.success : AppTheme.gray700,
@@ -180,7 +180,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: filteredStudents.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       return _buildStudentCard(filteredStudents[index]);
                     },
@@ -242,7 +242,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: AppTheme.success.withOpacity(0.1),
+                  backgroundColor: AppTheme.success.withValues(alpha: 0.1),
                   child: Text(
                     name[0].toUpperCase(),
                     style: TextStyle(
@@ -279,7 +279,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: isActive
-                        ? AppTheme.success.withOpacity(0.1)
+                        ? AppTheme.success.withValues(alpha: 0.1)
                         : AppTheme.gray200,
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -320,7 +320,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: DataTable(
-          headingRowColor: MaterialStateProperty.all(AppTheme.gray50),
+          headingRowColor: WidgetStateProperty.all(AppTheme.gray50),
           columns: [
             DataColumn(
               label: Text(
@@ -372,7 +372,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
                     children: [
                       CircleAvatar(
                         radius: 16,
-                        backgroundColor: AppTheme.success.withOpacity(0.1),
+                        backgroundColor: AppTheme.success.withValues(alpha: 0.1),
                         child: Text(
                           name[0].toUpperCase(),
                           style: TextStyle(
@@ -396,7 +396,7 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: isActive
-                          ? AppTheme.success.withOpacity(0.1)
+                          ? AppTheme.success.withValues(alpha: 0.1)
                           : AppTheme.gray200,
                       borderRadius: BorderRadius.circular(4),
                     ),
@@ -416,10 +416,6 @@ class _BatchStudentsScreenState extends ConsumerState<BatchStudentsScreen> {
         ),
       ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
   }
 
   String _formatDateTime(String dateTimeStr) {

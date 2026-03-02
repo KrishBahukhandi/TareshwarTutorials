@@ -275,8 +275,8 @@ class _EditCourseScreenState extends State<EditCourseScreen> {
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
                                     color: _isPublished
-                                        ? AppTheme.success.withOpacity(0.1)
-                                        : AppTheme.warning.withOpacity(0.1),
+                                        ? AppTheme.success.withValues(alpha: 0.1)
+                                        : AppTheme.warning.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Icon(
@@ -316,7 +316,7 @@ class _EditCourseScreenState extends State<EditCourseScreen> {
                                   onChanged: (value) {
                                     setState(() => _isPublished = value);
                                   },
-                                  activeColor: AppTheme.success,
+                                  activeThumbColor: AppTheme.success,
                                 ),
                               ],
                             ),

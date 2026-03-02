@@ -48,7 +48,7 @@ class AppTheme {
         outline: gray300,
         error: error,
         errorContainer: errorLight,
-        shadow: Colors.black.withOpacity(0.1),
+        shadow: Colors.black.withValues(alpha: 0.1),
       ),
       
       // Scaffold

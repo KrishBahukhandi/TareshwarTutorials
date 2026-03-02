@@ -171,7 +171,7 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
                             return Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: AppTheme.warning.withOpacity(0.1),
+                                color: AppTheme.warning.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(color: AppTheme.warning),
                               ),
@@ -191,7 +191,7 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
                           }
 
                           return DropdownButtonFormField<String>(
-                            value: _batchId,
+                            initialValue: _batchId,
                             decoration: InputDecoration(
                               labelText: 'Select Batch *',
                               prefixIcon: Icon(Icons.class_, color: AppTheme.gray400),
@@ -247,7 +247,7 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
                         error: (error, _) => Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: AppTheme.error.withOpacity(0.1),
+                            color: AppTheme.error.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: AppTheme.error),
                           ),
@@ -368,7 +368,7 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppTheme.error.withOpacity(0.1),
+                            color: AppTheme.error.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: AppTheme.error),
                           ),
@@ -412,6 +412,8 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
 
                                   final title = _titleController.text.trim();
                                   final duration = int.parse(_durationController.text.trim());
+                                  final messenger = ScaffoldMessenger.of(context);
+                                  final router = GoRouter.of(context);
 
                                   await ref.read(videoUploadProvider.notifier).uploadVideo(
                                         batchId: _batchId!,
@@ -436,7 +438,7 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
                                       _batchId = null;
                                     });
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
+                                    messenger.showSnackBar(
                                       SnackBar(
                                         content: const Row(
                                           children: [
@@ -449,7 +451,7 @@ class _UploadVideoScreenState extends ConsumerState<UploadVideoScreen> {
                                         duration: const Duration(seconds: 3),
                                       ),
                                     );
-                                    context.go('/teacher/content');
+                                    router.go('/teacher/content');
                                   }
                                 },
                           icon: Icon(

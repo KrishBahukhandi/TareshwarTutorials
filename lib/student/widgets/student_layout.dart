@@ -87,7 +87,7 @@ class _StudentAppBar extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 18,
-                backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
+                backgroundColor: AppTheme.primaryBlue.withValues(alpha: 0.1),
                 child: Icon(
                   Icons.person,
                   color: AppTheme.primaryBlue,
@@ -169,7 +169,7 @@ class _SidebarContent extends ConsumerWidget {
                 Text(
                   'Student Portal',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 13,
                   ),
                 ),
@@ -177,7 +177,7 @@ class _SidebarContent extends ConsumerWidget {
             ),
           ),
           
-          Divider(color: Colors.white.withOpacity(0.2), height: 1),
+          Divider(color: Colors.white.withValues(alpha: 0.2), height: 1),
           
           // Navigation items
           Expanded(
@@ -224,7 +224,7 @@ class _SidebarContent extends ConsumerWidget {
           ),
 
           // Logout button at bottom
-          Divider(color: Colors.white.withOpacity(0.2), height: 1),
+          Divider(color: Colors.white.withValues(alpha: 0.2), height: 1),
           InkWell(
             onTap: () {
               ref.read(authControllerProvider.notifier).signOut();
@@ -235,14 +235,14 @@ class _SidebarContent extends ConsumerWidget {
                 children: [
                   Icon(
                     Icons.logout,
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     size: 20,
                   ),
                   const SizedBox(width: 12),
                   Text(
                     'Logout',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                     ),
@@ -291,7 +291,7 @@ class _NavItem extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           decoration: BoxDecoration(
             color: isActive
-                ? Colors.white.withOpacity(0.15)
+                ? Colors.white.withValues(alpha: 0.15)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
@@ -301,7 +301,7 @@ class _NavItem extends StatelessWidget {
                 icon,
                 color: isActive
                     ? Colors.white
-                    : Colors.white.withOpacity(0.7),
+                    : Colors.white.withValues(alpha: 0.7),
                 size: 20,
               ),
               const SizedBox(width: 12),
@@ -310,7 +310,7 @@ class _NavItem extends StatelessWidget {
                 style: TextStyle(
                   color: isActive
                       ? Colors.white
-                      : Colors.white.withOpacity(0.7),
+                      : Colors.white.withValues(alpha: 0.7),
                   fontSize: 15,
                   fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                 ),

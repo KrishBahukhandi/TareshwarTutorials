@@ -136,7 +136,7 @@ class _CourseListScreenState extends ConsumerState<CourseListScreen> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    AppTheme.primaryBlue.withOpacity(0.8),
+                    AppTheme.primaryBlue.withValues(alpha: 0.8),
                     AppTheme.primaryBlue,
                   ],
                 ),

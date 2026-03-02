@@ -16,15 +16,17 @@ class NotesService {
   Future<List<NoteItem>> fetchForTeacher(String teacherId) async {
     final data = await supabase
         .from('notes')
-        .select()
+        .select('*, batches(*, courses(*))')
         .eq('uploaded_by', teacherId)
         .order('created_at', ascending: false);
     return data.map<NoteItem>((row) => NoteItem.fromMap(row)).toList();
   }
 
   Future<List<NoteItem>> fetchForStudent() async {
-    final data =
-        await supabase.from('notes').select().order('created_at', ascending: false);
+    final data = await supabase
+        .from('notes')
+        .select('*, batches(*, courses(*))')
+        .order('created_at', ascending: false);
     return data.map<NoteItem>((row) => NoteItem.fromMap(row)).toList();
   }
 
@@ -57,7 +59,7 @@ class NotesService {
     return _storageService.createSignedUrl(
       bucket: 'notes-pdfs',
       storagePath: storagePath,
-      expiresInSeconds: 3600,
+      expiresInSeconds: 21600, // 6 hours
     );
   }
 

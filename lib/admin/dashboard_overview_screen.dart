@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../auth/auth_controller.dart';
 import '../services/course_service.dart';
 import '../services/student_service.dart';
 import '../services/teacher_service.dart';
@@ -45,6 +46,10 @@ class DashboardOverviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isMobile = MediaQuery.of(context).size.width < 800;
     final padding = isMobile ? 16.0 : 32.0;
+    final profile = ref.watch(profileProvider);
+    final firstName = profile?.name.split(' ').first ?? 'Admin';
+    final now = DateTime.now();
+    final dateStr = '${_weekday(now.weekday)}, ${now.day} ${_month(now.month)} ${now.year}';
 
     return AdminLayout(
       currentRoute: '/admin',
@@ -54,21 +59,33 @@ class DashboardOverviewScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Page Header
-            Text(
-              'Dashboard',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Welcome back! Here\'s an overview of your platform.',
-              style: TextStyle(
-                fontSize: 15,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Welcome back, $firstName! 👋',
+                        style: TextStyle(
+                          fontSize: isMobile ? 22 : 28,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        dateStr,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 32),
 
@@ -102,7 +119,7 @@ class DashboardOverviewScreen extends ConsumerWidget {
                             onTap: () => context.go('/admin/students'),
                           ),
                           loading: () => const _LoadingCard(title: 'Total Students'),
-                          error: (_, __) => const _ErrorCard(title: 'Total Students'),
+                          error: (_, _) => const _ErrorCard(title: 'Total Students'),
                         ),
 
                     // Teachers Card
@@ -119,7 +136,7 @@ class DashboardOverviewScreen extends ConsumerWidget {
                             );
                           },
                           loading: () => const _LoadingCard(title: 'Total Teachers'),
-                          error: (_, __) => const _ErrorCard(title: 'Total Teachers'),
+                          error: (_, _) => const _ErrorCard(title: 'Total Teachers'),
                         ),
 
                     // Courses Card
@@ -133,7 +150,7 @@ class DashboardOverviewScreen extends ConsumerWidget {
                             onTap: () => context.go('/admin/courses'),
                           ),
                           loading: () => const _LoadingCard(title: 'Total Courses'),
-                          error: (_, __) => const _ErrorCard(title: 'Total Courses'),
+                          error: (_, _) => const _ErrorCard(title: 'Total Courses'),
                         ),
 
                     // Batches Card
@@ -147,7 +164,7 @@ class DashboardOverviewScreen extends ConsumerWidget {
                             onTap: () => context.go('/admin/batches'),
                           ),
                           loading: () => const _LoadingCard(title: 'Total Batches'),
-                          error: (_, __) => const _ErrorCard(title: 'Total Batches'),
+                          error: (_, _) => const _ErrorCard(title: 'Total Batches'),
                         ),
 
                     // Enrollments Card
@@ -161,7 +178,7 @@ class DashboardOverviewScreen extends ConsumerWidget {
                             onTap: () => context.go('/admin/enrollments'),
                           ),
                           loading: () => const _LoadingCard(title: 'Total Enrollments'),
-                          error: (_, __) => const _ErrorCard(title: 'Total Enrollments'),
+                          error: (_, _) => const _ErrorCard(title: 'Total Enrollments'),
                         ),
                   ],
                 );
@@ -295,3 +312,9 @@ class _QuickActionButton extends StatelessWidget {
     );
   }
 }
+
+String _weekday(int d) => const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][d - 1];
+String _month(int m) => const [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+][m - 1];

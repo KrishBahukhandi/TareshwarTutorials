@@ -136,7 +136,7 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                             return Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: AppTheme.warning.withOpacity(0.1),
+                                color: AppTheme.warning.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(color: AppTheme.warning),
                               ),
@@ -156,7 +156,7 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                           }
 
                           return DropdownButtonFormField<String>(
-                            value: _batchId,
+                            initialValue: _batchId,
                             decoration: InputDecoration(
                               labelText: 'Select Batch *',
                               prefixIcon: Icon(Icons.class_, color: AppTheme.gray400),
@@ -212,7 +212,7 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                         error: (error, _) => Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: AppTheme.error.withOpacity(0.1),
+                            color: AppTheme.error.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: AppTheme.error),
                           ),
@@ -330,7 +330,7 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: AppTheme.error.withOpacity(0.1),
+                            color: AppTheme.error.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: AppTheme.error),
                           ),
@@ -373,6 +373,8 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                                   }
 
                                   final title = _titleController.text.trim();
+                                  final messenger = ScaffoldMessenger.of(context);
+                                  final router = GoRouter.of(context);
 
                                   await ref.read(notesUploadProvider.notifier).uploadNote(
                                         batchId: _batchId!,
@@ -395,7 +397,7 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                                       _batchId = null;
                                     });
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
+                                    messenger.showSnackBar(
                                       SnackBar(
                                         content: const Row(
                                           children: [
@@ -408,7 +410,7 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                                         duration: const Duration(seconds: 3),
                                       ),
                                     );
-                                    context.go('/teacher/content');
+                                    router.go('/teacher/content');
                                   }
                                 },
                           icon: Icon(

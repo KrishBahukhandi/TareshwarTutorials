@@ -146,7 +146,7 @@ class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
       label: Text(label),
       selected: isSelected,
       onSelected: (selected) => setState(() => _filter = value),
-      selectedColor: AppTheme.primaryBlue.withOpacity(0.2),
+      selectedColor: AppTheme.primaryBlue.withValues(alpha: 0.2),
       checkmarkColor: AppTheme.primaryBlue,
       labelStyle: TextStyle(
         color: isSelected ? AppTheme.primaryBlue : AppTheme.gray700,
@@ -219,7 +219,7 @@ class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
             Container(
               height: 120,
               decoration: BoxDecoration(
-                color: AppTheme.primaryBlue.withOpacity(0.1),
+                color: AppTheme.primaryBlue.withValues(alpha: 0.1),
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               ),
               child: Center(
@@ -242,7 +242,7 @@ class _MyCoursesScreenState extends ConsumerState<MyCoursesScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.1),
+                        color: statusColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
