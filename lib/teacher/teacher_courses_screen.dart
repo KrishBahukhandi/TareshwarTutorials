@@ -205,7 +205,7 @@ class _TeacherCoursesScreenState extends ConsumerState<TeacherCoursesScreen> {
         side: BorderSide(color: AppTheme.gray200),
       ),
       child: InkWell(
-        onTap: () => context.go('/teacher/batches/$batchId/students'),
+        onTap: () => context.go('/teacher/batches/$batchId/detail'),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -278,13 +278,13 @@ class _TeacherCoursesScreenState extends ConsumerState<TeacherCoursesScreen> {
               ),
               const SizedBox(height: 16),
 
-              // View Students Button
+              // View Batch Button
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () => context.go('/teacher/batches/$batchId/students'),
-                  icon: Icon(Icons.people, size: 16),
-                  label: const Text('View Students'),
+                  onPressed: () => context.go('/teacher/batches/$batchId/detail'),
+                  icon: Icon(Icons.open_in_new, size: 16),
+                  label: const Text('View Batch'),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     side: BorderSide(color: AppTheme.success),

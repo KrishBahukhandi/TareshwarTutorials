@@ -11,7 +11,7 @@ import '../services/teacher_service.dart';
 import '../services/supabase_client.dart';
 import 'widgets/teacher_layout.dart';
 
-// Provider for teacher batches (simplified)
+// Provider for teacher batches (notes upload)
 final teacherBatchesSimpleProviderNotes = FutureProvider<List<Map<String, dynamic>>>((ref) async {
   final teacherId = supabase.auth.currentUser?.id;
   if (teacherId == null) return [];
@@ -19,7 +19,10 @@ final teacherBatchesSimpleProviderNotes = FutureProvider<List<Map<String, dynami
 });
 
 class UploadNotesScreen extends ConsumerStatefulWidget {
-  const UploadNotesScreen({super.key});
+  const UploadNotesScreen({super.key, this.preselectedBatchId});
+
+  /// When navigated from a batch detail, this batch is pre-selected.
+  final String? preselectedBatchId;
 
   @override
   ConsumerState<UploadNotesScreen> createState() => _UploadNotesScreenState();
@@ -33,10 +36,20 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
   String? _batchId;
 
   @override
+  void initState() {
+    super.initState();
+    _batchId = widget.preselectedBatchId;
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
     super.dispose();
   }
+
+  String get _backRoute => widget.preselectedBatchId != null
+      ? '/teacher/batches/${widget.preselectedBatchId}/detail'
+      : '/teacher/content';
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +72,7 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
-                    onPressed: () => context.go('/teacher/content'),
+                    onPressed: () => context.go(_backRoute),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -77,10 +90,7 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                         const SizedBox(height: 4),
                         Text(
                           'Upload study materials and resources for your students',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppTheme.gray600,
-                          ),
+                          style: TextStyle(fontSize: 14, color: AppTheme.gray600),
                         ),
                       ],
                     ),
@@ -106,18 +116,16 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                         controller: _titleController,
                         decoration: InputDecoration(
                           labelText: 'Notes Title *',
-                          hintText: 'e.g., Chapter 5: Advanced Algorithms',
+                          hintText: 'e.g., Chapter 5: Quadratic Equations',
                           prefixIcon: Icon(Icons.title, color: AppTheme.gray400),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
                             borderSide: BorderSide(color: AppTheme.gray300),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: AppTheme.success, width: 2),
+                            borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
                           ),
                         ),
                         validator: (value) {
@@ -154,22 +162,19 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                               ),
                             );
                           }
-
                           return DropdownButtonFormField<String>(
                             initialValue: _batchId,
                             decoration: InputDecoration(
                               labelText: 'Select Batch *',
                               prefixIcon: Icon(Icons.class_, color: AppTheme.gray400),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(color: AppTheme.gray300),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(color: AppTheme.success, width: 2),
+                                borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
                               ),
                             ),
                             items: items.map((item) {
@@ -177,35 +182,29 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                               final courseTitle = course?['title'] ?? 'Unknown Course';
                               final startDate = DateTime.parse(item['start_date'] as String);
                               final formattedDate = '${startDate.day}/${startDate.month}/${startDate.year}';
-                              
                               return DropdownMenuItem(
                                 value: item['id'] as String,
-                                child: Text('$courseTitle ($formattedDate)'),
+                                child: Text('$courseTitle ($formattedDate)', overflow: TextOverflow.ellipsis),
                               );
                             }).toList(),
                             onChanged: (value) => setState(() => _batchId = value),
                             validator: (value) {
-                              if (value == null) {
-                                return 'Please select a batch';
-                              }
+                              if (value == null) return 'Please select a batch';
                               return null;
                             },
                           );
                         },
-                        loading: () => Container(
+                        loading: () => Padding(
                           padding: const EdgeInsets.all(16),
                           child: Row(
                             children: [
                               SizedBox(
                                 width: 20,
                                 height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: AppTheme.success,
-                                ),
+                                child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryBlue),
                               ),
                               const SizedBox(width: 12),
-                              Text('Loading batches...', style: TextStyle(color: AppTheme.gray600)),
+                              Text('Loading batches…', style: TextStyle(color: AppTheme.gray600)),
                             ],
                           ),
                         ),
@@ -222,7 +221,7 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
-                                  'Failed to load batches: ${error.toString()}',
+                                  'Failed to load batches: $error',
                                   style: TextStyle(color: AppTheme.error),
                                 ),
                               ),
@@ -233,9 +232,10 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                       const SizedBox(height: 24),
 
                       // File Picker
-                      Container(                              decoration: BoxDecoration(
+                      Container(
+                        decoration: BoxDecoration(
                           border: Border.all(
-                            color: _fileBytes == null ? AppTheme.gray300 : AppTheme.success,
+                            color: _fileBytes == null ? AppTheme.gray300 : AppTheme.primaryBlue,
                             width: _fileBytes == null ? 1 : 2,
                           ),
                           borderRadius: BorderRadius.circular(8),
@@ -256,33 +256,28 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                           },
                           borderRadius: BorderRadius.circular(8),
                           child: Padding(
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(24),
                             child: Column(
                               children: [
                                 Icon(
-                                  _fileBytes == null ? Icons.cloud_upload : Icons.check_circle,
+                                  _fileBytes == null ? Icons.upload_file_outlined : Icons.check_circle,
                                   size: 48,
-                                  color: _fileBytes == null ? AppTheme.gray400 : AppTheme.success,
+                                  color: _fileBytes == null ? AppTheme.gray400 : AppTheme.primaryBlue,
                                 ),
                                 const SizedBox(height: 12),
                                 Text(
-                                  _fileBytes == null 
-                                      ? 'Click to select document file' 
-                                      : 'Document selected',
+                                  _fileBytes == null ? 'Click to select document' : 'Document selected ✓',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: _fileBytes == null ? AppTheme.gray700 : AppTheme.success,
+                                    color: _fileBytes == null ? AppTheme.gray700 : AppTheme.primaryBlue,
                                   ),
                                 ),
                                 if (_fileName != null) ...[
                                   const SizedBox(height: 8),
                                   Text(
                                     _fileName!,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: AppTheme.gray600,
-                                    ),
+                                    style: TextStyle(fontSize: 14, color: AppTheme.gray600),
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
                                     textAlign: TextAlign.center,
@@ -291,11 +286,8 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                                 if (_fileBytes == null) ...[
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Supported formats: PDF, DOC, DOCX, TXT, PPT, PPTX',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: AppTheme.gray500,
-                                    ),
+                                    'Supported: PDF, DOC, DOCX, PPT, PPTX, TXT',
+                                    style: TextStyle(fontSize: 12, color: AppTheme.gray500),
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
@@ -311,15 +303,13 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                         LinearProgressIndicator(
                           value: uploadState.progress,
                           backgroundColor: AppTheme.gray200,
-                          valueColor: AlwaysStoppedAnimation<Color>(AppTheme.success),
+                          valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryBlue),
+                          borderRadius: BorderRadius.circular(4),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Uploading... ${(uploadState.progress * 100).toStringAsFixed(0)}%',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: AppTheme.gray600,
-                          ),
+                          'Uploading… ${(uploadState.progress * 100).toStringAsFixed(0)}%',
+                          style: TextStyle(fontSize: 14, color: AppTheme.gray600),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -358,10 +348,7 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                           onPressed: uploadState.status == UploadStatus.uploading
                               ? null
                               : () async {
-                                  if (!_formKey.currentState!.validate()) {
-                                    return;
-                                  }
-
+                                  if (!_formKey.currentState!.validate()) return;
                                   if (_fileBytes == null) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
@@ -383,20 +370,17 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                                         fileName: _fileName!,
                                       );
 
-                                  // Read the LATEST state after upload completes
                                   final result = ref.read(notesUploadProvider);
                                   if (!mounted) return;
 
                                   if (result.status == UploadStatus.success) {
-                                    // Reset the form
                                     _formKey.currentState!.reset();
                                     _titleController.clear();
                                     setState(() {
                                       _fileBytes = null;
                                       _fileName = null;
-                                      _batchId = null;
+                                      if (widget.preselectedBatchId == null) _batchId = null;
                                     });
-
                                     messenger.showSnackBar(
                                       SnackBar(
                                         content: const Row(
@@ -406,31 +390,29 @@ class _UploadNotesScreenState extends ConsumerState<UploadNotesScreen> {
                                             Text('Notes uploaded successfully!'),
                                           ],
                                         ),
-                                        backgroundColor: AppTheme.success,
+                                        backgroundColor: AppTheme.primaryBlue,
                                         duration: const Duration(seconds: 3),
                                       ),
                                     );
-                                    router.go('/teacher/content');
+                                    router.go(_backRoute);
                                   }
                                 },
                           icon: Icon(
                             uploadState.status == UploadStatus.uploading
                                 ? Icons.hourglass_empty
-                                : Icons.upload,
+                                : Icons.upload_file,
                           ),
                           label: Text(
                             uploadState.status == UploadStatus.uploading
-                                ? 'Uploading...'
+                                ? 'Uploading…'
                                 : 'Upload Notes',
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.success,
+                            backgroundColor: AppTheme.primaryBlue,
                             foregroundColor: Colors.white,
                             disabledBackgroundColor: AppTheme.gray300,
                             disabledForegroundColor: AppTheme.gray600,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                         ),
                       ),

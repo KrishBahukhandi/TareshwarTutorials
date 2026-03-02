@@ -32,6 +32,7 @@ import '../student/video_list_screen.dart';
 import '../student/video_player_screen.dart';
 
 import '../teacher/batch_students_screen.dart';
+import '../teacher/batch_detail_screen.dart';
 import '../teacher/teacher_content_list_screen.dart';
 import '../teacher/teacher_courses_screen.dart';
 import '../teacher/teacher_dashboard.dart';
@@ -154,6 +155,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final batchId = state.pathParameters['id']!;
           return BatchStudentsScreen(batchId: batchId);
+        },
+      ),
+      GoRoute(
+        path: '/teacher/batches/:id/detail',
+        builder: (context, state) {
+          final batchId = state.pathParameters['id']!;
+          return BatchDetailScreen(batchId: batchId);
+        },
+      ),
+      GoRoute(
+        path: '/teacher/batches/:id/upload-video',
+        builder: (context, state) {
+          final batchId = state.pathParameters['id']!;
+          return UploadVideoScreen(preselectedBatchId: batchId);
+        },
+      ),
+      GoRoute(
+        path: '/teacher/batches/:id/upload-notes',
+        builder: (context, state) {
+          final batchId = state.pathParameters['id']!;
+          return UploadNotesScreen(preselectedBatchId: batchId);
         },
       ),
       GoRoute(
